@@ -32,6 +32,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // Route::apiResource('restaurants', RestaurantController::class);
     Route::get('/restaurants', [RestaurantController::class, 'index']);
     Route::post('/restaurants', [RestaurantController::class, 'store'])->middleware('role_check:admin_or_restaurant_owner');
+    Route::get('/restaurants/{restaurant}', [RestaurantController::class, 'show'])->middleware('role_check:admin_or_restaurant_owner');
    
     /* // user role management
     Route::apiResource('userRole', UserRoleController::class);

@@ -29,6 +29,11 @@ php artisan db:seed
 npm install
 php artisan serve
 ```
+## First Login
+```bash
+email super_admin@gmail.com
+password super_admin
+```
 
 
 ## Postman Test

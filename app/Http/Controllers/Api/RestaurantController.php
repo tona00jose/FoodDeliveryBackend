@@ -116,7 +116,11 @@ class RestaurantController extends ApiController
      */
     public function show(string $id)
     {
-        //
+        $restaurant = Restaurant::find($id);
+        if($restaurant)
+            return $this->successResponse(new RestaurantResource($restaurant));
+        else
+            return $this->errorResponse(__('message.not_found_msg'), 404);
     }
 
     /**

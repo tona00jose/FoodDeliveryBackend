@@ -1,0 +1,532 @@
+{
+  "info": {
+    "_postman_id": "6edd1d3b-736b-4bb6-97b6-b4a4df2c21dc",
+    "name": "Food Delivery",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "52191391",
+    "_collection_link": "https://go.postman.co/collection/52191391-6edd1d3b-736b-4bb6-97b6-b4a4df2c21dc?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Auth Management",
+      "item": [
+        {
+          "name": "register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "name",
+                  "value": "aaa",
+                  "description": "required|string",
+                  "type": "text",
+                  "uuid": "0618349d-06c8-4abc-afcd-8a4d9c4ef691"
+                },
+                {
+                  "key": "email",
+                  "value": "aaa@gmail.com",
+                  "description": "required|email|unique:users,email",
+                  "type": "text",
+                  "uuid": "a687471e-c248-48bf-a0e1-e50a57110b27"
+                },
+                {
+                  "key": "password",
+                  "value": "123456789",
+                  "description": "required|string",
+                  "type": "text",
+                  "uuid": "efc8bfcd-a071-4b17-95f9-7f03c7eb4b9c"
+                },
+                {
+                  "key": "role",
+                  "value": "1",
+                  "description": "1:Restaurant Owner, 2:Customer (default value is 2)",
+                  "type": "text",
+                  "uuid": "1912ab8d-dac8-4055-ae60-b4fd5e4d348e",
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "email",
+                  "value": "aaa@gmail.com",
+                  "type": "text",
+                  "uuid": "4dfc414d-fc11-48fc-a606-6ac5f5d7b143"
+                },
+                {
+                  "key": "password",
+                  "value": "123456789",
+                  "type": "text",
+                  "uuid": "fd9116c4-66b0-454e-a209-5c5463684fb0"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "logout",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User Management",
+      "item": [
+        {
+          "name": "get user list",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "per_page",
+                  "value": "5",
+                  "description": "0 : all, 0 > : show items per page(defaule is 10)",
+                  "disabled": true
+                },
+                {
+                  "key": "search_string",
+                  "value": "aaa",
+                  "description": "Values ​​for searching name or email",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create user",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "name",
+                  "value": "aaa3",
+                  "description": "required|string",
+                  "type": "text",
+                  "uuid": "63486756-d887-4c6b-8582-d6922e688974"
+                },
+                {
+                  "key": "email",
+                  "value": "aaa3@gmail.com",
+                  "description": "required|email|unique:users,email",
+                  "type": "text",
+                  "uuid": "c947c513-ddf5-4512-9991-39bd010fecb0"
+                },
+                {
+                  "key": "password",
+                  "value": "123456789",
+                  "description": "required|string",
+                  "type": "text",
+                  "uuid": "030b1d12-2099-4a81-a8c7-95587bbf79aa"
+                },
+                {
+                  "key": "role",
+                  "value": "1",
+                  "description": "0:Administrator, 1:Restaurant Owner, 2:Customer (default is 2)",
+                  "type": "text",
+                  "uuid": "40922c96-22ce-47e4-b3e9-2c50d14c702e"
+                },
+                {
+                  "key": "is_blocked",
+                  "value": "0",
+                  "description": "0:enabled, 1:blocked",
+                  "type": "text",
+                  "uuid": "266a9f9c-c466-4556-988f-8f5467fda718"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get user detail",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/users/2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update user",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "name",
+                  "value": "bb",
+                  "description": "required|string",
+                  "type": "text",
+                  "uuid": "e8639d7a-0b6c-44e5-b65d-e8b79ccb7566"
+                },
+                {
+                  "key": "email",
+                  "value": "bbb@gmail.com",
+                  "description": "required|email|unique:users,email",
+                  "type": "text",
+                  "uuid": "0cf34d92-983a-4b61-a960-e190cbedb779"
+                },
+                {
+                  "key": "password",
+                  "value": "123456789",
+                  "description": "required|string",
+                  "type": "text",
+                  "uuid": "97ca92df-0f0f-4f56-9d16-80e7f693a9da"
+                },
+                {
+                  "key": "role",
+                  "value": "0",
+                  "description": "0:Administrator, 1:Restaurant Owner, 2:Customer (default is 2)",
+                  "type": "text",
+                  "uuid": "0a29cfbd-b5a8-496f-805a-bc13859bdd79"
+                },
+                {
+                  "key": "is_blocked",
+                  "value": "0",
+                  "description": "0:enabled, 1:blocked",
+                  "type": "text",
+                  "uuid": "0694e185-5ca4-4d03-b95d-ec741bcfeb82"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/users/3",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete user",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/users/3",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Restaurant Management",
+      "item": [
+        {
+          "name": "get restaurant list",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/restaurants?per_page=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "restaurants"
+              ],
+              "query": [
+                {
+                  "key": "per_page",
+                  "value": "5",
+                  "description": "0 : all, 0 > : show items per page(defaule is 10)"
+                },
+                {
+                  "key": "search_string",
+                  "value": "Osteria",
+                  "description": "Values ​​for searching restaurant name, description or user name",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create restaurant",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "name",
+                  "value": "Hops & Harvest",
+                  "description": "required|string",
+                  "type": "text",
+                  "uuid": "08302781-5ed6-488d-b176-33232cc41b32"
+                },
+                {
+                  "key": "user_id",
+                  "value": "3",
+                  "description": "Use only if the registering user is an admin.  If the user is the restaurant owner, default value is the logged-in user's id.",
+                  "type": "text",
+                  "uuid": "93a199bb-b530-4a5f-9fc7-57f74fe9cdef"
+                },
+                {
+                  "key": "description",
+                  "value": "Hops & Harvest is a neighborhood gathering place that pairs elevated comfort food with an impressive curation of craft beer. Our seasonally rotating menu features gourmet burgers, artisanal flatbreads, and shareable plates made from farm-fresh, regional ingredients. Whether you are catching the game at our reclaimed wood bar or relaxing on our dog-friendly outdoor patio, you'll find a welcoming, lively environment perfect for any occasion.",
+                  "description": "nullable|string",
+                  "type": "text",
+                  "uuid": "82ce1954-4d4e-496d-a677-904258830e59"
+                },
+                {
+                  "key": "is_blocked",
+                  "value": "0",
+                  "description": "0:enabled, 1:blocked",
+                  "type": "text",
+                  "uuid": "bf816045-1e2f-4a6a-b3a4-2c79953e0c53"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/restaurants",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "restaurants"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": ""
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ]
+}

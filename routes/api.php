@@ -21,11 +21,8 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     
-    // access admin
-    Route::group([
-        'prefix' => 'admin',
-        'middleware' => ['role_check:admin']
-    ], function () {
+    // can access admin
+    Route::group([ 'prefix' => 'admin', 'middleware' => ['role_check:admin'] ], function () {
         // user management
         Route::apiResource('users', UserController::class);
         Route::put('/users/block/{user}', [UserController::class, 'blockItem']);                        // block
@@ -40,7 +37,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/meals', [MealController::class, 'index']);                                             // list
     Route::get('/meals/{meal}', [MealController::class, 'show']);                                       // detail
 
-    // access admin, restaurant owner
+    // can access admin, restaurant owner
     Route::middleware(['role_check:admin_or_restaurant_owner'])->group(function () {
         // restaurant
         Route::post('/restaurants', [RestaurantController::class, 'store']);                            // create
@@ -56,7 +53,13 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 
     // order
-    Route::post('/orders', [OrderController::class, 'store']);                            // create
+    Route::post('/orders', [OrderController::class, 'store'])                               // create
+            ->middleware('role_check:admin_or_customer');                                   // can access admin or customer
+    Route::get('/orders', [OrderController::class, 'index']);                               // list
+    Route::get('/orders/{order}', [OrderController::class, 'show']);                        // detail
+    Route::delete('/orders/{order}', [OrderController::class, 'destroy'])                   // delete
+            ->middleware('role_check:admin');                                               // can access admin
+    Route::post('/orders/updateStatus/{order}', [OrderController::class, 'updateStatus']);  // change order status
 
 });
 

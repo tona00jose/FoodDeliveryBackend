@@ -35,6 +35,8 @@ class OrderStatusHistory extends Model
 
     protected $attributes = [];
 
+    protected $appends = ['old_status_name', 'new_status_name'];
+
     // Relations
     public function order()
     {
@@ -52,5 +54,51 @@ class OrderStatusHistory extends Model
             ->logAll()
             ->logOnlyDirty()
             ->setDescriptionForEvent(fn(string $eventName) => "Team {$eventName}");
+    }
+
+    public function getOldStatusNameAttribute()
+    {
+        return match ($this->old_status) {
+            Order::STATUS_PLACED     => 'placed',
+            Order::STATUS_CANCELLED  => 'cancelled',
+            Order::STATUS_PROCESSING => 'processing',
+            Order::STATUS_IN_ROUTE   => 'in route',
+            Order::STATUS_DELIVERED  => 'delivered',
+            Order::STATUS_RECEIVED   => 'received',
+            Order::STATUS_REJECTED   => 'rejected',
+            default                  => '',
+        };
+    }
+
+    public function getNewStatusNameAttribute()
+    {
+        return match ($this->new_status) {
+            Order::STATUS_PLACED     => 'placed',
+            Order::STATUS_CANCELLED  => 'cancelled',
+            Order::STATUS_PROCESSING => 'processing',
+            Order::STATUS_IN_ROUTE   => 'in route',
+            Order::STATUS_DELIVERED  => 'delivered',
+            Order::STATUS_RECEIVED   => 'received',
+            Order::STATUS_REJECTED   => 'rejected',
+            default                  => '',
+        };
+    }
+
+    public function toArray()
+    {
+        $array = parent::toArray();
+
+        return [
+            'id'               => $array['id'],
+            'order_id'         => $array['order_id'],
+            'old_status'       => $array['old_status'],
+            'old_status_name'  => $array['old_status_name'],
+            'new_status'       => $array['new_status'],
+            'new_status_name'  => $array['new_status_name'],
+            'changed_by'       => $array['changed_by'],
+            'created_at'       => $array['created_at'],
+            'updated_at'       => $array['updated_at'],
+            'deleted_at'       => $array['deleted_at'],
+        ];
     }
 }

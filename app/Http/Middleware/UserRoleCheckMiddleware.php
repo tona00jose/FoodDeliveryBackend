@@ -38,6 +38,16 @@ class UserRoleCheckMiddleware
             } else {
                 return $next($request);
             }
+        } else if($role_name == 'admin_or_customer') {
+            if (auth()->user()->role == 1) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Only Administrator or Customer can access.',
+                    "data" => null
+                ], 403);
+            } else {
+                return $next($request);
+            }
         }
         return response()->json([
             'status' => 'error',

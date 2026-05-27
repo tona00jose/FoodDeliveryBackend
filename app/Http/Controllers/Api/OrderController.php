@@ -24,7 +24,45 @@ class OrderController extends ApiController
      */
     public function index(Request $request)
     {
-        //
+        // Default per page
+        $per_page = $request->input('per_page', 10);
+
+        // Build query
+        // $query = Order::query();
+        $query = Order::with('orderItems', 'orderStatusHistories');
+
+        $user = auth()->user();
+        if($user->role == 1) { // restaurant owner
+            $query->whereHas('restaurant', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            });
+        } else if($user->role == 2) { // customer
+            $query->where('user_id', $user->id);
+        }
+
+        // Paginate
+        if ($per_page == 0) {
+            $collection = $query->get();
+            $orders = new LengthAwarePaginator(
+                $collection,
+                $collection->count(),
+                $collection->count(), // all in one page
+                0,
+                [
+                    'path' => request()->url(),
+                    'query' => request()->query(),
+                ]
+            );
+        } else {
+            $orders = $query->paginate($per_page);
+        }
+
+        // Return paginated resource
+        return $this->successResponse([
+            'orders' => OrderResource::collection($orders),
+            'links' => OrderResource::collection($orders)->response()->getData()->links,
+            'meta' => OrderResource::collection($orders)->response()->getData()->meta,
+        ]);
     }
 
     /**
@@ -169,6 +207,7 @@ class OrderController extends ApiController
             ]);
 
             DB::commit();
+
             $order->load('orderItems');
             $order->load('orderStatusHistories');
             return $this->successResponse(new OrderResource($order), 200);
@@ -184,7 +223,29 @@ class OrderController extends ApiController
      */
     public function show(string $id)
     {
-        //
+        $order = Order::find($id);        
+        if($order){
+            $order->load('orderItems');
+            $order->load('orderStatusHistories');
+            $user = auth()->user();
+            if($user->role == 0) { // admin
+                return $this->successResponse(new OrderResource($order));
+            } else if($user->role == 2) { // customer
+                if($order->user_id != $user->id) { 
+                    return $this->errorResponse(__('message.cannot_access'), 403);
+                } else {
+                    return $this->successResponse(new OrderResource($order));
+                }
+            } else {    // restaurant owner
+                if($order->restaurant->user_id == $user->id) {
+                    return $this->successResponse(new OrderResource($order));
+                } else {
+                    return $this->errorResponse(__('message.can_access_only_restaurant_owner'), 403);
+                }
+            }
+        } else {
+            return $this->errorResponse(__('message.not_found_msg'), 404);
+        }
     }
 
     /**
@@ -200,6 +261,90 @@ class OrderController extends ApiController
      */
     public function destroy(string $id)
     {
-        //
+        $order = Order::find($id);
+        if($order) {
+            $order->orderItems()->delete();
+            $order->orderStatusHistories()->delete();
+            $order->delete();
+            return $this->successResponse(new OrderResource($order), 200);
+        } else {
+            return $this->errorResponse(__('message.not_found_msg'), 404);
+        }
+    }
+
+    /**
+     * Update status in storage.
+     */
+    public function updateStatus(Request $request, string $id)
+    {
+        $order = Order::find($id);
+        if($order) {
+            $user = auth()->user();
+            $allowed_access = false;
+            if($user->role == 0) { // admin
+                $allowed_access = true;
+            } else if($user->role == 2) { // customer
+                if($order->user_id == $user->id) { 
+                    $allowed_access = true;
+                }
+            } else {    // restaurant owner
+                if($order->restaurant->user_id == $user->id) {
+                    $allowed_access = true;
+                }
+            }
+            
+            if($allowed_access) {
+                $validator = Validator::make($request->all(), [
+                    'status' => 'required|integer|in:0,1,2,3,4,5,6',                    
+                ]);
+
+                if ($validator->fails()) {
+                    return $this->errorResponse($validator->messages(), 422);
+                }
+
+                $old_status = $order->status;
+                $new_status = $request->status;
+                $is_valid_status = false;
+                if($old_status != $new_status) {
+                    if($user->role == 0) {             // admin
+                        $is_valid_status = true;
+                    } else if($user->role == 2) {      // customer
+                        if($old_status != Order::STATUS_REJECTED) {    
+                            if($old_status == Order::STATUS_PLACED) {
+                                if($new_status == Order::STATUS_CANCELLED || $new_status == Order::STATUS_RECEIVED) {
+                                    $is_valid_status = true;
+                                }
+                            } else if($old_status == Order::STATUS_DELIVERED && $new_status == Order::STATUS_RECEIVED) {
+                                $is_valid_status = true;
+                            }   
+                        }
+                    } else {    // restaurant owner
+                        if($old_status != Order::STATUS_CANCELLED && $old_status != Order::STATUS_RECEIVED) {
+                            if($new_status == Order::STATUS_PLACED || $new_status == Order::STATUS_PROCESSING 
+                            || $new_status == Order::STATUS_IN_ROUTE || $new_status == Order::STATUS_DELIVERED
+                            || $new_status == Order::STATUS_REJECTED) {
+                                $is_valid_status = true;
+                            }
+                        } 
+                    }
+                }
+
+                if($is_valid_status) {
+                    $order->update([ 'status' => $new_status ]);
+                    $order->orderStatusHistories()->create([
+                        'old_status' => $old_status,
+                        'new_status' => $new_status,
+                        'changed_by' => $user->id,
+                    ]);
+                    return $this->successResponse(new OrderResource($order), 200, __("message.success"));
+                } else {
+                    return $this->errorResponse(__('message.cannot_change_status'), 403);
+                }
+            } else {
+                return $this->errorResponse(__('message.can_access_only_admin_or_restaurant_owner'), 403);
+            }
+        } else {
+            return $this->errorResponse(__('message.not_found_msg'), 404);
+        }
     }
 }

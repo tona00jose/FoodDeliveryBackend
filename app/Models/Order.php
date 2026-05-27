@@ -18,6 +18,7 @@ class Order extends Model
     const STATUS_IN_ROUTE   = 3;
     const STATUS_DELIVERED  = 4;
     const STATUS_RECEIVED   = 5;
+    const STATUS_REJECTED   = 6;
 
     protected $table = 'orders'; // optional (Laravel auto-detects)
 
@@ -46,6 +47,8 @@ class Order extends Model
     protected $hidden = [];
 
     protected $attributes = [];
+
+    protected $appends = ['status_name'];
 
     // Relations
     public function user()
@@ -84,5 +87,19 @@ class Order extends Model
             ->logAll()
             ->logOnlyDirty()
             ->setDescriptionForEvent(fn(string $eventName) => "Team {$eventName}");
+    }
+
+    public function getStatusNameAttribute()
+    {
+        return match ($this->status) {
+            self::STATUS_PLACED     => 'placed',
+            self::STATUS_CANCELLED  => 'cancelled',
+            self::STATUS_PROCESSING => 'processing',
+            self::STATUS_IN_ROUTE   => 'in route',
+            self::STATUS_DELIVERED  => 'delivered',
+            self::STATUS_RECEIVED   => 'received',
+            self::STATUS_REJECTED   => 'rejected',
+            default                  => '',
+        };
     }
 }

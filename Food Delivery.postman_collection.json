@@ -92,7 +92,7 @@
               "urlencoded": [
                 {
                   "key": "email",
-                  "value": "ccc@gmail.com",
+                  "value": "bbb@gmail.com",
                   "type": "text",
                   "uuid": "4dfc414d-fc11-48fc-a606-6ac5f5d7b143"
                 },
@@ -1209,7 +1209,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"restaurant_id\": 3,             // required|integer|exists:restaurants,id\r\n    \"coupon_code\": \"7CIRPJO0\",      // nullable|string|max:255|exists:coupons,code\r\n    \"tip_amount\": 5,\r\n    \"items\": [\r\n        {\r\n            \"meal_id\": 1,\r\n            \"quantity\": 2\r\n        },\r\n        {\r\n            \"meal_id\": 3,\r\n            \"quantity\": 1\r\n        }\r\n    ]\r\n}",
+              "raw": "{\r\n    \"restaurant_id\": 3,             // required|integer|exists:restaurants,id\r\n    \"coupon_code\": \"R0QLT7CL\",      // nullable|string|max:255|exists:coupons,code\r\n    \"tip_amount\": 5,                // nullable|numeric|min:0\r\n    \"items\": [                      // required|array|min:1\r\n        {\r\n            \"meal_id\": 5,           // required|integer|exists:meals,id\r\n            \"quantity\": 1           // required|integer|min:1\r\n        },\r\n        {\r\n            \"meal_id\": 6,\r\n            \"quantity\": 1\r\n        }\r\n    ]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1224,6 +1224,276 @@
               "path": [
                 "api",
                 "orders"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get order list",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Visualization Script",
+                  "// Visualization Script",
+                  "const template = `",
+                  "<style>",
+                  "  body { font-family: Arial, sans-serif; padding: 16px; color: #222; }",
+                  "  .summary { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }",
+                  "  .card { background: #f8f9fb; border: 1px solid #e3e7ee; border-radius: 8px; padding: 12px 16px; min-width: 180px; }",
+                  "  .card h3 { margin: 0 0 6px; font-size: 13px; color: #555; font-weight: 600; }",
+                  "  .card p { margin: 0; font-size: 22px; font-weight: 700; }",
+                  "  table { width: 100%; border-collapse: collapse; font-size: 14px; }",
+                  "  th, td { border: 1px solid #e3e7ee; padding: 10px 12px; text-align: left; vertical-align: top; }",
+                  "  th { background: #f3f5f7; font-weight: 600; }",
+                  "  tr:nth-child(even) { background: #fafbfc; }",
+                  "  .empty { padding: 16px; background: #fff8e1; border: 1px solid #ffe082; border-radius: 8px; }",
+                  "</style>",
+                  "",
+                  "<div>",
+                  "  {{#if hasOrders}}",
+                  "    <div class=\"summary\">",
+                  "      <div class=\"card\">",
+                  "        <h3>Total Orders</h3>",
+                  "        <p>{{totalOrders}}</p>",
+                  "      </div>",
+                  "      <div class=\"card\">",
+                  "        <h3>Total Revenue</h3>",
+                  "        <p>{{totalRevenue}}</p>",
+                  "      </div>",
+                  "    </div>",
+                  "",
+                  "    <table>",
+                  "      <thead>",
+                  "        <tr>",
+                  "          <th>ID</th>",
+                  "          <th>User</th>",
+                  "          <th>Restaurant</th>",
+                  "          <th>Subtotal</th>",
+                  "          <th>Discount</th>",
+                  "          <th>Total</th>",
+                  "          <th>Status</th>",
+                  "          <th>Ordered At</th>",
+                  "          <th>Item Count</th>",
+                  "        </tr>",
+                  "      </thead>",
+                  "      <tbody>",
+                  "        {{#each orders}}",
+                  "          <tr>",
+                  "            <td>{{id}}</td>",
+                  "            <td>{{user_name}}</td>",
+                  "            <td>{{restaurant_name}}</td>",
+                  "            <td>{{subtotal}}</td>",
+                  "            <td>{{discount_amount}}</td>",
+                  "            <td>{{total_amount}}</td>",
+                  "            <td>{{status_name}}</td>",
+                  "            <td>{{ordered_at}}</td>",
+                  "            <td>{{item_count}}</td>",
+                  "          </tr>",
+                  "        {{/each}}",
+                  "      </tbody>",
+                  "    </table>",
+                  "  {{else}}",
+                  "    <div class=\"empty\">No orders found in the response.</div>",
+                  "  {{/if}}",
+                  "</div>`;",
+                  "",
+                  "function createPayload() {",
+                  "  let json = {};",
+                  "  try {",
+                  "    json = pm.response.json();",
+                  "  } catch (e) {",
+                  "    return {",
+                  "      hasOrders: false,",
+                  "      totalOrders: 0,",
+                  "      totalRevenue: '$0.00',",
+                  "      orders: []",
+                  "    };",
+                  "  }",
+                  "",
+                  "  const sourceOrders = Array.isArray(json?.data?.orders) ? json.data.orders : [];",
+                  "",
+                  "  const orders = sourceOrders.map((order) => {",
+                  "    const total = Number(order?.total_amount || 0);",
+                  "    const subtotal = Number(order?.subtotal || 0);",
+                  "    const discount = Number(order?.discount_amount || 0);",
+                  "    const items = Array.isArray(order?.order_items) ? order.order_items.length : 0;",
+                  "",
+                  "    return {",
+                  "      id: order?.id ?? 'N/A',",
+                  "      user_name: order?.user_name || 'N/A',",
+                  "      restaurant_name: order?.restaurant_name || 'N/A',",
+                  "      subtotal: `$${subtotal.toFixed(2)}`,",
+                  "      discount_amount: `$${discount.toFixed(2)}`,",
+                  "      total_amount: `$${total.toFixed(2)}`,",
+                  "      status_name: order?.status_name || 'N/A',",
+                  "      ordered_at: order?.ordered_at || 'N/A',",
+                  "      item_count: items",
+                  "    };",
+                  "  });",
+                  "",
+                  "  const totalRevenueValue = sourceOrders.reduce((sum, order) => {",
+                  "    return sum + Number(order?.total_amount || 0);",
+                  "  }, 0);",
+                  "",
+                  "  return {",
+                  "    hasOrders: orders.length > 0,",
+                  "    totalOrders: orders.length,",
+                  "    totalRevenue: `$${totalRevenueValue.toFixed(2)}`,",
+                  "    orders",
+                  "  };",
+                  "}",
+                  "",
+                  "pm.visualizer.set(template, createPayload());"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/orders?per_page=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "orders"
+              ],
+              "query": [
+                {
+                  "key": "per_page",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get order detail",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/orders/5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                "5"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete order",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/orders/5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                "5"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update order status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "status",
+                  "value": "6",
+                  "description": "0:placed, 1:canceled, 2:processing, 3:in route, 4:delivered, 5:received, 6:rejected",
+                  "type": "text",
+                  "uuid": "dbbac532-9d3a-4827-8a32-208252327418"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/orders/updateStatus/5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                "updateStatus",
+                "5"
               ]
             }
           },

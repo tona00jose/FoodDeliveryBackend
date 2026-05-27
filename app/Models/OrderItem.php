@@ -36,6 +36,8 @@ class OrderItem extends Model
 
     protected $attributes = [];
 
+    protected $appends = ['meal_name'];
+
     // Relations
     public function order()
     {
@@ -45,6 +47,11 @@ class OrderItem extends Model
     public function meal()
     {
         return $this->belongsTo(Meal::class);
+    }
+
+    public function getMealNameAttribute()
+    {
+        return $this->meal ? $this->meal->name : '';
     }
 
     public function getCreatedAtAttribute($value)
@@ -58,5 +65,22 @@ class OrderItem extends Model
             ->logAll()
             ->logOnlyDirty()
             ->setDescriptionForEvent(fn(string $eventName) => "Team {$eventName}");
+    }
+
+    public function toArray()
+    {
+        $array = parent::toArray();
+        return [
+            'id'                    => $array['id'],
+            'order_id'              => $array['order_id'],
+            'meal_id'               => $array['meal_id'],
+            'meal_name'             => $array['meal_name'],
+            'quantity'              => $array['quantity'],
+            'price_at_order_time'   => $array['price_at_order_time'],
+            'subtotal'              => $array['subtotal'],
+            'created_at'            => $array['created_at'],
+            'updated_at'            => $array['updated_at'],
+            'deleted_at'            => $array['deleted_at'],
+        ];
     }
 }

@@ -86,7 +86,7 @@ class UserController extends ApiController
         $user->name = $request->name;
         $user->email = $request->email;
         $user->password = $request->password;
-        if($request->has('role') && $request->role != "") $user->role = $request->role; else $user->role = 2;
+        if($request->has('role') && $request->role != "") $user->role = $request->role; else $user->role = self::ROLE_CUSTOMER;
         $user->is_super_admin = 0;
         if($request->has('is_blocked') && $request->is_blocked != "") $user->is_blocked = $request->is_blocked; else $user->is_blocked = 0;
         $user->save();

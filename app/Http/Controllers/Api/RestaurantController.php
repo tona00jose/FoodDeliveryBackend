@@ -28,9 +28,9 @@ class RestaurantController extends ApiController
         // $query = Restaurant::with('meals');
         $query = Restaurant::query();
 
-        if($user->role == 1) { // restaurant owner
+        if($user->role == self::ROLE_RESTAURANT_OWNER) { // restaurant owner
             $query->where('user_id', $user->id);
-        } else if($user->role == 2) { // customer
+        } else if($user->role == self::ROLE_CUSTOMER) { // customer
             $query->where('is_blocked', 0);
             $query->whereHas('user', function ($userQuery) {
                 $userQuery->where('is_blocked', 0);
@@ -82,15 +82,15 @@ class RestaurantController extends ApiController
         $validator = Validator::make($request->all(), [
             'name'  => 'required|string|max:255',
             'user_id' => [
-                auth()->user()->role == 0 ? 'required' : 'nullable',
+                auth()->user()->role == self::ROLE_ADMIN ? 'required' : 'nullable',
                 'integer',
                 'exists:users,id',
                 function ($attribute, $value, $fail) {
                     // user_id must belong to role 1 user
                     if ($value) {
-                        if(auth()->user()->role == 0) { // admin
+                        if(auth()->user()->role == self::ROLE_ADMIN) { // admin
                             $user = User::find($value);
-                            if (!$user || $user->role != 1) {
+                            if (!$user || $user->role != self::ROLE_RESTAURANT_OWNER) {
                                 $fail(__('message.selected_user_must_have_restaurant_owner_role'));
                             }
                         }
@@ -106,7 +106,7 @@ class RestaurantController extends ApiController
         }
 
         $user_id = auth()->user()->id;
-        if(auth()->user()->role == 0) { // admin
+        if(auth()->user()->role == self::ROLE_ADMIN) { // admin
             $user_id = $request->user_id;
         }
 
@@ -129,9 +129,9 @@ class RestaurantController extends ApiController
         $restaurant = Restaurant::find($id);
         if($restaurant){
             $user = auth()->user();
-            if($user->role == 0) { // admin
+            if($user->role == self::ROLE_ADMIN) { // admin
                 return $this->successResponse(new RestaurantResource($restaurant));
-            } else if($user->role == 2) { // customer
+            } else if($user->role == self::ROLE_CUSTOMER) { // customer
                 if($restaurant->is_blocked == 1) { // blocked restaurant
                     return $this->errorResponse(__('message.data_is_blocked'), 403);
                 } else if($restaurant->user->is_blocked == 1) { // blocked restaurant owner
@@ -159,7 +159,7 @@ class RestaurantController extends ApiController
         $restaurant = Restaurant::find($id);
         if($restaurant) {
             $allowed_access = false;
-            if(auth()->user()->role == 0) { // admin
+            if(auth()->user()->role == self::ROLE_ADMIN) { // admin
                 $allowed_access = true;
             } else {    // restaurant owner
                 if($restaurant->user_id == auth()->user()->id) {
@@ -176,9 +176,9 @@ class RestaurantController extends ApiController
                         function ($attribute, $value, $fail) {
                             // user_id must belong to role 1 user
                             if ($value) {
-                                if(auth()->user()->role == 0) { // admin
+                                if(auth()->user()->role == self::ROLE_ADMIN) { // admin
                                     $user = User::find($value);
-                                    if (!$user || $user->role != 1) {
+                                    if (!$user || $user->role != self::ROLE_RESTAURANT_OWNER) {
                                         $fail(__('message.selected_user_must_have_restaurant_owner_role'));
                                     }
                                 }
@@ -194,7 +194,7 @@ class RestaurantController extends ApiController
                 }
 
                 $user_id = auth()->user()->id;
-                if(auth()->user()->role == 0) { // admin
+                if(auth()->user()->role == self::ROLE_ADMIN) { // admin
                     $user_id = $request->user_id;
                 }
 
@@ -221,7 +221,7 @@ class RestaurantController extends ApiController
         $restaurant = Restaurant::find($id);
         if($restaurant) {
             $allowed_access = false;
-            if(auth()->user()->role == 0) { // admin
+            if(auth()->user()->role == self::ROLE_ADMIN) { // admin
                 $allowed_access = true;
             } else {    // restaurant owner
                 if($restaurant->user_id == auth()->user()->id) {
@@ -247,7 +247,7 @@ class RestaurantController extends ApiController
         $restaurant = Restaurant::find($id);
         if($restaurant) {
             $allowed_access = false;
-            if(auth()->user()->role == 0) { // admin
+            if(auth()->user()->role == self::ROLE_ADMIN) { // admin
                 $allowed_access = true;
             } else {    // restaurant owner
                 if($restaurant->user_id == auth()->user()->id) {

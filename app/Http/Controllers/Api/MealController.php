@@ -28,11 +28,11 @@ class MealController extends ApiController
 
         // Build query
         $query = Meal::query();
-        if($user->role == 1) { // restaurant owner
+        if($user->role == self::ROLE_RESTAURANT_OWNER) { // restaurant owner
             $query->whereHas('restaurant', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
-        } else if($user->role == 2) { // customer
+        } else if($user->role == self::ROLE_CUSTOMER) { // customer
             $query->where('is_blocked', 0);
             $query->whereHas('restaurant', function ($restaurantQuery) {
                 $restaurantQuery->where('is_blocked', 0);
@@ -93,7 +93,7 @@ class MealController extends ApiController
         ];
         // 'restaurant_id'     => 'required|integer|exists:restaurants,id'
         $restaurantRule = Rule::exists('restaurants', 'id')->whereNull('deleted_at');
-        if ($user->role == 1) { // restaurant owner
+        if ($user->role == self::ROLE_RESTAURANT_OWNER) { // restaurant owner
             $restaurantRule = $restaurantRule->where('user_id', $user->id);
         }
         $rules['restaurant_id'] = ['required', 'integer', $restaurantRule];
@@ -122,9 +122,9 @@ class MealController extends ApiController
         $meal = Meal::find($id);
         if($meal){
             $user = auth()->user();
-            if($user->role == 0) { // admin
+            if($user->role == self::ROLE_ADMIN) { // admin
                 return $this->successResponse(new MealResource($meal));
-            } else if($user->role == 2) { // customer
+            } else if($user->role == self::ROLE_CUSTOMER) { // customer
                 if($meal->is_blocked == 1) {                                                // blocked meal
                     return $this->errorResponse(__('message.data_is_blocked'), 403);
                 } else if($meal->restaurant->is_blocked == 1) {                             // blocked restaurant
@@ -155,7 +155,7 @@ class MealController extends ApiController
         if($meal) {
             $user = auth()->user();
             $allowed_access = false;
-            if($user->role == 0) { // admin
+            if($user->role == self::ROLE_ADMIN) { // admin
                 $allowed_access = true;
             } else {    // restaurant owner
                 if($meal->restaurant->user_id == $user->id) {
@@ -170,7 +170,7 @@ class MealController extends ApiController
                     'is_blocked'    => 'nullable|integer|in:0,1',
                 ];
                 $restaurantRule = Rule::exists('restaurants', 'id')->whereNull('deleted_at');
-                if ($user->role == 1) { // restaurant owner
+                if ($user->role == self::ROLE_RESTAURANT_OWNER) { // restaurant owner
                     $restaurantRule = $restaurantRule->where('user_id', $user->id);
                 }
                 $rules['restaurant_id'] = ['nullable', 'integer', $restaurantRule];
@@ -204,7 +204,7 @@ class MealController extends ApiController
         $meal = Meal::find($id);
         if($meal) {
             $allowed_access = false;
-            if(auth()->user()->role == 0) { // admin
+            if(auth()->user()->role == self::ROLE_ADMIN) { // admin
                 $allowed_access = true;
             } else {    // restaurant owner
                 if($meal->restaurant->user_id == auth()->user()->id) {
@@ -230,7 +230,7 @@ class MealController extends ApiController
         $meal = Meal::find($id);
         if($meal) {
             $allowed_access = false;
-            if(auth()->user()->role == 0) { // admin
+            if(auth()->user()->role == self::ROLE_ADMIN) { // admin
                 $allowed_access = true;
             } else {    // restaurant owner
                 if($meal->restaurant->user_id == auth()->user()->id) {

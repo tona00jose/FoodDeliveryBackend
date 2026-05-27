@@ -61,10 +61,10 @@ class AuthController extends ApiController
             return $this->errorResponse($validator->messages(), 422);
         }
 
-        $role = 2;
-        if($request->role == 1) $role = 1;
+        $role = self::ROLE_CUSTOMER;
+        if($request->role == self::ROLE_RESTAURANT_OWNER) $role = self::ROLE_RESTAURANT_OWNER;
 
-        DB::beginTransaction();
+        // DB::beginTransaction();
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -73,7 +73,8 @@ class AuthController extends ApiController
             'is_blocked' => 0,
             'password' => Hash::make($request->password)
         ]);
-        DB::commit();
+        // DB::commit();
+        
         return $this->successResponse(new UserResource($user), 200);
     }
 

@@ -12,6 +12,11 @@ class ApiController extends Controller
 {
     use ApiResponser;
 
+    // Roles
+    public const ROLE_ADMIN = 0;
+    public const ROLE_RESTAURANT_OWNER = 1;
+    public const ROLE_CUSTOMER = 2;
+
     public function __construct()
     {
         $this->middleware(function ($request, $next) {

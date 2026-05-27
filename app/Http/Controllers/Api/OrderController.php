@@ -32,11 +32,11 @@ class OrderController extends ApiController
         $query = Order::with('orderItems', 'orderStatusHistories');
 
         $user = auth()->user();
-        if($user->role == 1) { // restaurant owner
+        if($user->role == self::ROLE_RESTAURANT_OWNER) { // restaurant owner
             $query->whereHas('restaurant', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
-        } else if($user->role == 2) { // customer
+        } else if($user->role == self::ROLE_CUSTOMER) { // customer
             $query->where('user_id', $user->id);
         }
 
@@ -86,7 +86,7 @@ class OrderController extends ApiController
                         $userQuery->select(DB::raw(1))
                             ->from('users')
                             ->whereColumn('users.id', 'restaurants.user_id')
-                            ->where('users.role', 1)
+                            ->where('users.role', self::ROLE_RESTAURANT_OWNER)
                             ->where('users.is_blocked', 0)
                             ->whereNull('users.deleted_at');
                     });
@@ -115,7 +115,7 @@ class OrderController extends ApiController
                             ->from('users')
                             ->join('restaurants', 'restaurants.user_id', '=', 'users.id')
                             ->whereColumn('restaurants.id', 'meals.restaurant_id')
-                            ->where('users.role', 1)
+                            ->where('users.role', self::ROLE_RESTAURANT_OWNER)
                             ->where('users.is_blocked', 0)
                             ->whereNull('users.deleted_at');
                     });
@@ -228,9 +228,9 @@ class OrderController extends ApiController
             $order->load('orderItems');
             $order->load('orderStatusHistories');
             $user = auth()->user();
-            if($user->role == 0) { // admin
+            if($user->role == self::ROLE_ADMIN) { // admin
                 return $this->successResponse(new OrderResource($order));
-            } else if($user->role == 2) { // customer
+            } else if($user->role == self::ROLE_CUSTOMER) { // customer
                 if($order->user_id != $user->id) { 
                     return $this->errorResponse(__('message.cannot_access'), 403);
                 } else {
@@ -281,9 +281,9 @@ class OrderController extends ApiController
         if($order) {
             $user = auth()->user();
             $allowed_access = false;
-            if($user->role == 0) { // admin
+            if($user->role == self::ROLE_ADMIN) { // admin
                 $allowed_access = true;
-            } else if($user->role == 2) { // customer
+            } else if($user->role == self::ROLE_CUSTOMER) { // customer
                 if($order->user_id == $user->id) { 
                     $allowed_access = true;
                 }
@@ -306,9 +306,9 @@ class OrderController extends ApiController
                 $new_status = $request->status;
                 $is_valid_status = false;
                 if($old_status != $new_status) {
-                    if($user->role == 0) {             // admin
+                    if($user->role == self::ROLE_ADMIN) {             // admin
                         $is_valid_status = true;
-                    } else if($user->role == 2) {      // customer
+                    } else if($user->role == self::ROLE_CUSTOMER) {      // customer
                         if($old_status != Order::STATUS_REJECTED) {    
                             if($old_status == Order::STATUS_PLACED) {
                                 if($new_status == Order::STATUS_CANCELLED || $new_status == Order::STATUS_RECEIVED) {

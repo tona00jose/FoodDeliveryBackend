@@ -32,7 +32,7 @@ class UserRoleCheckMiddleware
             if (auth()->user()->role > 1) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Only administrator or Restaurant Owner can access.',
+                    'message' => 'Only Administrator or Restaurant Owner can access.',
                     "data" => null
                 ], 403);
             } else {

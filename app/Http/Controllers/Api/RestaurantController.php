@@ -25,9 +25,16 @@ class RestaurantController extends ApiController
         $per_page = $request->input('per_page', 10);
 
         // Build query
+        // $query = Restaurant::with('meals');
         $query = Restaurant::query();
+
         if($user->role == 1) { // restaurant owner
             $query->where('user_id', $user->id);
+        } else if($user->role == 2) { // customer
+            $query->where('is_blocked', 0);
+            $query->whereHas('user', function ($userQuery) {
+                $userQuery->where('is_blocked', 0);
+            });
         }
 
         // Optional search
@@ -73,7 +80,7 @@ class RestaurantController extends ApiController
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name'              => 'required|string',
+            'name'  => 'required|string|max:255',
             'user_id' => [
                 auth()->user()->role == 0 ? 'required' : 'nullable',
                 'integer',
@@ -81,15 +88,17 @@ class RestaurantController extends ApiController
                 function ($attribute, $value, $fail) {
                     // user_id must belong to role 1 user
                     if ($value) {
-                        $user = User::find($value);
-                        if (!$user || $user->role != 1) {
-                            $fail('The selected user must have the Restaurant Owner role.');
+                        if(auth()->user()->role == 0) { // admin
+                            $user = User::find($value);
+                            if (!$user || $user->role != 1) {
+                                $fail(__('message.selected_user_must_have_restaurant_owner_role'));
+                            }
                         }
                     }
                 },
             ],
-            'description'       => 'nullable|string',
-            'is_blocked'        => 'nullable|integer|in:0,1',
+            'description' => 'nullable|string',
+            'is_blocked' => 'nullable|integer|in:0,1',
         ]);
 
         if ($validator->fails()) {
@@ -116,11 +125,30 @@ class RestaurantController extends ApiController
      */
     public function show(string $id)
     {
+        // $restaurant = Restaurant::with('meals')->find($id);
         $restaurant = Restaurant::find($id);
-        if($restaurant)
-            return $this->successResponse(new RestaurantResource($restaurant));
-        else
+        if($restaurant){
+            $user = auth()->user();
+            if($user->role == 0) { // admin
+                return $this->successResponse(new RestaurantResource($restaurant));
+            } else if($user->role == 2) { // customer
+                if($restaurant->is_blocked == 1) { // blocked restaurant
+                    return $this->errorResponse(__('message.data_is_blocked'), 403);
+                } else if($restaurant->user->is_blocked == 1) { // blocked restaurant owner
+                    return $this->errorResponse(__('message.restaurant_owner_is_blocked'), 403);
+                } else {
+                    return $this->successResponse(new RestaurantResource($restaurant));
+                }
+            } else {    // restaurant owner
+                if($restaurant->user_id == $user->id) {
+                    return $this->successResponse(new RestaurantResource($restaurant));
+                } else {
+                    return $this->errorResponse(__('message.can_access_only_restaurant_owner'), 403);
+                }
+            }
+        } else {
             return $this->errorResponse(__('message.not_found_msg'), 404);
+        }
     }
 
     /**
@@ -128,7 +156,61 @@ class RestaurantController extends ApiController
      */
     public function update(Request $request, string $id)
     {
-        //
+        $restaurant = Restaurant::find($id);
+        if($restaurant) {
+            $allowed_access = false;
+            if(auth()->user()->role == 0) { // admin
+                $allowed_access = true;
+            } else {    // restaurant owner
+                if($restaurant->user_id == auth()->user()->id) {
+                    $allowed_access = true;
+                }
+            }
+            if($allowed_access) {
+                $validator = Validator::make($request->all(), [
+                    'name' => 'nullable|string|max:255',
+                    'user_id' => [
+                        'nullable',
+                        'integer',
+                        'exists:users,id',
+                        function ($attribute, $value, $fail) {
+                            // user_id must belong to role 1 user
+                            if ($value) {
+                                if(auth()->user()->role == 0) { // admin
+                                    $user = User::find($value);
+                                    if (!$user || $user->role != 1) {
+                                        $fail(__('message.selected_user_must_have_restaurant_owner_role'));
+                                    }
+                                }
+                            }
+                        },
+                    ],
+                    'description' => 'nullable|string',
+                    'is_blocked' => 'nullable|integer|in:0,1',
+                ]);
+
+                if ($validator->fails()) {
+                    return $this->errorResponse($validator->messages(), 422);
+                }
+
+                $user_id = auth()->user()->id;
+                if(auth()->user()->role == 0) { // admin
+                    $user_id = $request->user_id;
+                }
+
+                $restaurant->update([
+                    'name' => $request->has('name')  && $request->name != "" ? $request->name : $restaurant->name,
+                    'user_id' => $request->has('user_id')  && $request->user_id != "" ? $user_id : $restaurant->user_id,
+                    'description' => $request->has('description') && $request->description != "" ? $request->description : $restaurant->description,
+                    'is_blocked' => $request->has('is_blocked') && $request->is_blocked != "" ? $request->is_blocked : $restaurant->is_blocked,
+                ]);
+                return $this->successResponse(new RestaurantResource($restaurant), 200, __("message.success"));
+            } else {
+                return $this->errorResponse(__('message.can_access_only_admin_or_restaurant_owner'), 403);
+            }
+        } else {
+            return $this->errorResponse(__('message.not_found_msg'), 404);
+        }
     }
 
     /**
@@ -136,6 +218,52 @@ class RestaurantController extends ApiController
      */
     public function destroy(string $id)
     {
-        //
+        $restaurant = Restaurant::find($id);
+        if($restaurant) {
+            $allowed_access = false;
+            if(auth()->user()->role == 0) { // admin
+                $allowed_access = true;
+            } else {    // restaurant owner
+                if($restaurant->user_id == auth()->user()->id) {
+                    $allowed_access = true;
+                }
+            }
+            if($allowed_access) {
+                $restaurant->delete();
+                return $this->successResponse(new RestaurantResource($restaurant), 200);
+            } else {
+                return $this->errorResponse(__('message.can_access_only_admin_or_restaurant_owner'), 403);
+            }
+        } else {
+            return $this->errorResponse(__('message.not_found_msg'), 404);
+        }
+    }
+
+    /**
+     * Block the specified resource from storage.
+     */
+    public function blockItem(string $id)
+    {
+        $restaurant = Restaurant::find($id);
+        if($restaurant) {
+            $allowed_access = false;
+            if(auth()->user()->role == 0) { // admin
+                $allowed_access = true;
+            } else {    // restaurant owner
+                if($restaurant->user_id == auth()->user()->id) {
+                    $allowed_access = true;
+                }
+            }
+            if($allowed_access) {
+                $restaurant->update([
+                    'is_blocked' => 1,
+                ]);
+                return $this->successResponse(new RestaurantResource($restaurant), 200);
+            } else {
+                return $this->errorResponse(__('message.can_access_only_admin_or_restaurant_owner'), 403);
+            }
+        } else {
+            return $this->errorResponse(__('message.not_found_msg'), 404);
+        }
     }
 }

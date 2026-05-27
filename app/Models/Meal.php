@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
-class Restaurant extends Model
+class Meal extends Model
 {
     use SoftDeletes, LogsActivity;
 
-    protected $table = 'restaurants'; // optional (Laravel auto-detects)
+    protected $table = 'meals'; // optional (Laravel auto-detects)
 
     /**
      * The attributes that are mass assignable.
@@ -21,8 +21,9 @@ class Restaurant extends Model
      */
     protected $fillable = [
         'name',
-        'user_id',
+        'restaurant_id',
         'description',
+        'price',
         'is_blocked'
     ];
 
@@ -34,18 +35,13 @@ class Restaurant extends Model
     protected $hidden = [];
 
     protected $attributes = [
-        'user_id' => NULL
+        'restaurant_id' => NULL
     ];
 
     // Relations
-    public function user()
+    public function restaurant()
     {
-        return $this->belongsTo(User::class);
-    }
-
-    public function meals()
-    {
-        return $this->hasMany(Meal::class);
+        return $this->belongsTo(Restaurant::class);
     }
 
     public function getCreatedAtAttribute($value)
@@ -60,4 +56,5 @@ class Restaurant extends Model
             ->logOnlyDirty()
             ->setDescriptionForEvent(fn(string $eventName) => "Team {$eventName}");
     }
+
 }

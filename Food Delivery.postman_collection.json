@@ -64,6 +64,26 @@
         },
         {
           "name": "login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();\r",
+                  "\r",
+                  "if (response.data && response.data.token) {\r",
+                  "    const fullToken = response.data.token;\r",
+                  "    const token = fullToken.split('|')[1];\r",
+                  "    pm.collectionVariables.set(\"token\", token);\r",
+                  "}\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [],
@@ -308,11 +328,12 @@
                   "value": "bb",
                   "description": "required|string",
                   "type": "text",
-                  "uuid": "e8639d7a-0b6c-44e5-b65d-e8b79ccb7566"
+                  "uuid": "e8639d7a-0b6c-44e5-b65d-e8b79ccb7566",
+                  "disabled": true
                 },
                 {
                   "key": "email",
-                  "value": "bbb@gmail.com",
+                  "value": "ddd@gmail.com",
                   "description": "required|email|unique:users,email",
                   "type": "text",
                   "uuid": "0cf34d92-983a-4b61-a960-e190cbedb779"
@@ -322,26 +343,29 @@
                   "value": "123456789",
                   "description": "required|string",
                   "type": "text",
-                  "uuid": "97ca92df-0f0f-4f56-9d16-80e7f693a9da"
+                  "uuid": "97ca92df-0f0f-4f56-9d16-80e7f693a9da",
+                  "disabled": true
                 },
                 {
                   "key": "role",
                   "value": "0",
                   "description": "0:Administrator, 1:Restaurant Owner, 2:Customer (default is 2)",
                   "type": "text",
-                  "uuid": "0a29cfbd-b5a8-496f-805a-bc13859bdd79"
+                  "uuid": "0a29cfbd-b5a8-496f-805a-bc13859bdd79",
+                  "disabled": true
                 },
                 {
                   "key": "is_blocked",
                   "value": "0",
                   "description": "0:enabled, 1:blocked",
                   "type": "text",
-                  "uuid": "0694e185-5ca4-4d03-b95d-ec741bcfeb82"
+                  "uuid": "0694e185-5ca4-4d03-b95d-ec741bcfeb82",
+                  "disabled": true
                 }
               ]
             },
             "url": {
-              "raw": "{{base_url}}/api/admin/users/3",
+              "raw": "{{base_url}}/api/admin/users/6",
               "host": [
                 "{{base_url}}"
               ],
@@ -349,7 +373,7 @@
                 "api",
                 "admin",
                 "users",
-                "3"
+                "6"
               ]
             }
           },
@@ -371,7 +395,7 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/admin/users/3",
+              "raw": "{{base_url}}/api/admin/users/5",
               "host": [
                 "{{base_url}}"
               ],
@@ -379,6 +403,37 @@
                 "api",
                 "admin",
                 "users",
+                "5"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "block user",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/users/block/3",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users",
+                "block",
                 "3"
               ]
             }
@@ -451,7 +506,7 @@
               "urlencoded": [
                 {
                   "key": "name",
-                  "value": "Hops & Harvest",
+                  "value": "Old Ebbitt Grill",
                   "description": "required|string",
                   "type": "text",
                   "uuid": "08302781-5ed6-488d-b176-33232cc41b32"
@@ -465,7 +520,7 @@
                 },
                 {
                   "key": "description",
-                  "value": "Hops & Harvest is a neighborhood gathering place that pairs elevated comfort food with an impressive curation of craft beer. Our seasonally rotating menu features gourmet burgers, artisanal flatbreads, and shareable plates made from farm-fresh, regional ingredients. Whether you are catching the game at our reclaimed wood bar or relaxing on our dog-friendly outdoor patio, you'll find a welcoming, lively environment perfect for any occasion.",
+                  "value": "The Old Ebbitt Grill, Washington's oldest saloon, was founded in 1856 when, according to legend, innkeeper William E. Ebbitt bought a boarding house. Today, no one can pinpoint the house’s exact location, but it was most likely on the edge of present-day Chinatown.",
                   "description": "nullable|string",
                   "type": "text",
                   "uuid": "82ce1954-4d4e-496d-a677-904258830e59"
@@ -487,6 +542,646 @@
               "path": [
                 "api",
                 "restaurants"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get restaurant detail",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/restaurants/3",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "restaurants",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update restaurant",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "name",
+                  "value": "Hops & Harvest",
+                  "type": "text",
+                  "uuid": "13d988e2-9037-4b8b-85a7-00a7d5f66d6b"
+                },
+                {
+                  "key": "user_id",
+                  "value": "6",
+                  "description": "Use only if the registering user is an admin.  If the user is the restaurant owner, default value is the logged-in user's id.",
+                  "type": "text",
+                  "uuid": "fe659919-899c-4d54-a12b-6d4e66fd13ff"
+                },
+                {
+                  "key": "description",
+                  "value": "Hops & Harvest is a neighborhood gathering place that pairs elevated comfort food with an impressive curation of craft beer. Our seasonally rotating menu features gourmet burgers, artisanal flatbreads, and shareable plates made from farm-fresh, regional ingredients. Whether you are catching the game at our reclaimed wood bar or relaxing on our dog-friendly outdoor patio, you'll find a welcoming, lively environment perfect for any occasion.",
+                  "description": "nullable|string",
+                  "type": "text",
+                  "uuid": "5dd6825d-3bd5-4600-9815-676127972c24"
+                },
+                {
+                  "key": "is_blocked",
+                  "value": "0",
+                  "description": "0:enabled, 1:blocked",
+                  "type": "text",
+                  "uuid": "bee57c33-5c7a-484d-a1fa-9caf28498932"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/restaurants/3",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "restaurants",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete restaurant",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/restaurants/3",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "restaurants",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "block restaurant",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/restaurants/block/3",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "restaurants",
+                "block",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Meal Management",
+      "item": [
+        {
+          "name": "get meal list",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/meals?per_page=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "meals"
+              ],
+              "query": [
+                {
+                  "key": "search_string",
+                  "value": "bubby",
+                  "description": "Values ​​for searching meal name, description or restaurant name",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "per_page",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create meal",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "name",
+                  "value": "Apple Pie",
+                  "description": "required|string",
+                  "type": "text",
+                  "uuid": "b64e83db-4edd-4b3f-94e8-98e7ae57a8cd"
+                },
+                {
+                  "key": "restaurant_id",
+                  "value": "3",
+                  "description": "required|integer|exists:restaurants,id",
+                  "type": "text",
+                  "uuid": "6011c5c1-ab3c-46ee-a111-19206e902891"
+                },
+                {
+                  "key": "price",
+                  "value": "9.00",
+                  "description": "required|numeric|min:0|max:9999999999999.99|decimal:0,2",
+                  "type": "text",
+                  "uuid": "5e471185-cd3c-4fcf-986b-42b7b20aa3e1"
+                },
+                {
+                  "key": "description",
+                  "value": "cinnamon, cloves, lemon zest, sea salt, double crust. *pastry crust made with leaf lard",
+                  "description": "nullable|string",
+                  "type": "text",
+                  "uuid": "7a9bec68-0ae5-4be0-9a10-e266bca2938e"
+                },
+                {
+                  "key": "is_blocked",
+                  "value": "0",
+                  "description": "0:enabled, 1:blocked",
+                  "type": "text",
+                  "uuid": "fb815886-7ad0-4c1b-b923-3293160b10a6"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/meals",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "meals"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get meal detail",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/meals/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "meals",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update meal",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "name",
+                  "value": "Cookie and Ice Cream",
+                  "description": "nullable|string",
+                  "type": "text",
+                  "uuid": "697c9285-3711-47a6-a032-348bb722a05f"
+                },
+                {
+                  "key": "restaurant_id",
+                  "value": "1",
+                  "description": "required|integer|exists:restaurants,id",
+                  "type": "text",
+                  "uuid": "6811c119-3e99-4100-96ea-72fe7b177432"
+                },
+                {
+                  "key": "price",
+                  "value": "6",
+                  "description": "nullable|numeric|min:0|max:9999999999999.99|decimal:0,2",
+                  "type": "text",
+                  "uuid": "8dad8c26-1e95-41ba-88b6-a8aebfb5d85a"
+                },
+                {
+                  "key": "description",
+                  "value": "salted chocolate chip cookie with homemade chocolate or vanilla ice cream",
+                  "description": "nullable|string",
+                  "type": "text",
+                  "uuid": "7565a9fc-d47b-419b-8442-1394d85dc3b4"
+                },
+                {
+                  "key": "is_blocked",
+                  "value": "0",
+                  "type": "text",
+                  "uuid": "c920c971-f848-4da5-b65b-02066e482e9b"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/meals/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "meals",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete meal",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/meals/2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "meals",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "block meal",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/meals/block/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "meals",
+                "block",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Coupon Management",
+      "item": [
+        {
+          "name": "get coupon list",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/coupons?per_page=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "coupons"
+              ],
+              "query": [
+                {
+                  "key": "per_page",
+                  "value": "5",
+                  "description": "0 : all, 0 > : show items per page(defaule is 10)",
+                  "type": "text"
+                },
+                {
+                  "key": "search_string",
+                  "value": "",
+                  "description": "Values ​​for searching code",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create coupon",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "discount_percent",
+                  "value": "10",
+                  "description": "required|numeric|min:1|max:100",
+                  "type": "text",
+                  "uuid": "87f697f4-d001-4589-9154-4ca6bc196b4a"
+                },
+                {
+                  "key": "expires_at",
+                  "value": "2026-12-31",
+                  "description": "nullable|date",
+                  "type": "text",
+                  "uuid": "93e4762d-f3cd-4df6-8711-41a35e59bd15"
+                },
+                {
+                  "key": "is_active",
+                  "value": "1",
+                  "description": "nullable|integer|in:0,1",
+                  "type": "text",
+                  "uuid": "cfccb14e-1a27-4353-8169-19d434afb438",
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/coupons",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "coupons"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get coupon detail",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/coupons/3",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "coupons",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update coupon",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "discount_percent",
+                  "value": "10.00",
+                  "description": "nullable|numeric|min:1|max:100",
+                  "type": "text",
+                  "uuid": "058ef472-9f92-42dd-87de-0929a98617eb"
+                },
+                {
+                  "key": "expires_at",
+                  "value": "2026-10-30",
+                  "description": "nullable|date",
+                  "type": "text",
+                  "uuid": "bdfd0c95-8a0d-4a43-90b8-80e312471a94"
+                },
+                {
+                  "key": "is_active",
+                  "value": "1",
+                  "description": "nullable|integer|in:0,1",
+                  "type": "text",
+                  "uuid": "37a5d6c3-a5c2-47ed-94f8-b654a081812b"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/coupons/3",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "coupons",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete coupon",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/coupons/3",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "coupons",
+                "3"
               ]
             }
           },

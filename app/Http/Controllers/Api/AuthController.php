@@ -18,8 +18,8 @@ class AuthController extends ApiController
     public function login(Request $request) {
         
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required|string',
+            'email' => 'required|email|max:255',
+            'password' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -51,9 +51,9 @@ class AuthController extends ApiController
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name'      => 'required|string',
-            'email'     => 'required|email|unique:users,email',
-            'password'  => 'required|string',
+            'name'      => 'required|string|max:255',
+            'email'     => 'required|email|max:255|unique:users,email,NULL,id,deleted_at,NULL',
+            'password'  => 'required|string|max:255',
             'role'      => 'integer|in:1,2',
         ]);
 

@@ -28,7 +28,8 @@ class UserController extends ApiController
         $per_page = $request->input('per_page', 10);
 
         // Build query
-        $query = User::with('restaurants');
+        // $query = User::with('restaurants');
+        $query = User::query();
 
         // Optional search
         if ($request->has('search_string') && $request->search_string != '') {
@@ -69,9 +70,9 @@ class UserController extends ApiController
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name'              => 'required|string',
-            'email'             => 'required|email|unique:users,email',
-            'password'          => 'required|string',
+            'name'              => 'required|string|max:255',
+            'email'             => 'required|email|max:255|unique:users,email,NULL,id,deleted_at,NULL', // unique:table,column,except,idColumn,whereColumn,whereValue
+            'password'          => 'required|string|max:255',
             'role'              => 'nullable|integer|in:0,1,2',
             'is_blocked'        => 'nullable|integer|in:0,1',
         ]);
@@ -98,7 +99,8 @@ class UserController extends ApiController
      */
     public function show(string $id)
     {
-        $user = User::with('restaurants')->find($id);
+        // $user = User::with('restaurants')->find($id);
+        $user = User::find($id);
         if($user)
             return $this->successResponse(new UserResource($user));
         else
@@ -113,25 +115,27 @@ class UserController extends ApiController
         $user = User::find($id);
         if($user) {
             $validator = Validator::make($request->all(), [
-                'name'  => 'nullable|string',
+                'name'  => 'nullable|string|max:255',
                 'email' => [
                     'nullable',
                     'email',
-                    'unique:users,email,'.$user->id,
+                    'max:255',
+                    'unique:users,email,'.$user->id.',id,deleted_at,NULL',
                     function ($attribute, $value, $fail) use ($user) {
                         // Super Admin cannot be changed role
                         if ($user->is_super_admin == 1 && $user->id != auth()->user()->id) {
-                            $fail('Only the super administrator can change their own email.');
+                            $fail(__('message.super_administrator_can_change_email'));
                         }
                     },
                 ],
                 'password' => [
                     'nullable',
                     'string',
+                    'max:255',
                     function ($attribute, $value, $fail) use ($user) {
                         // Super Admin cannot be changed role
                         if ($user->is_super_admin == 1 && $user->id != auth()->user()->id) {
-                            $fail('Only the super administrator can change their own password.');
+                            $fail(__('message.super_administrator_can_change_password'));
                         }
                     },
                 ],
@@ -142,7 +146,7 @@ class UserController extends ApiController
                     function ($attribute, $value, $fail) use ($user) {
                         // Super Admin cannot be changed role
                         if (($user->is_super_admin == 1)&& ($value > 0)) {
-                            $fail('The user is a user who cannot be changed role.');
+                            $fail(__('message.cannot_be_changed_role'));
                         }
                     },
                 ],
@@ -153,7 +157,7 @@ class UserController extends ApiController
                     function ($attribute, $value, $fail) use ($user) {
                         // Super Admin and logined self user cannot be blocked
                         if (($user->is_super_admin == 1 || $user->id == auth()->user()->id )&& $value == 1) {
-                            $fail('The user is a user who cannot be blocked.');
+                            $fail(__('message.cannot_be_blocked'));
                         }
                     },
                 ],
@@ -181,10 +185,30 @@ class UserController extends ApiController
     {
         $user = User::find($id);
         if($user) {
-            if($user->is_super_admin == 1) {
+            if($user->is_super_admin == 1 || $user->id == auth()->user()->id ) {
                 return $this->errorResponse(__('message.cannot_be_deleted'), 422);
             } else {
                 $user->delete();
+                return $this->successResponse(new UserResource($user), 200);
+            }
+        } else {
+            return $this->errorResponse(__('message.not_found_msg'), 404);
+        }
+    }
+
+    /**
+     * Block the specified resource from storage.
+     */
+    public function blockItem(string $id)
+    {
+        $user = User::find($id);
+        if($user) {
+            if($user->is_super_admin == 1 || $user->id == auth()->user()->id ) {
+                return $this->errorResponse(__('message.cannot_be_blocked'), 422);
+            } else {
+                $user->update([
+                    'is_blocked' => 1,
+                ]);
                 return $this->successResponse(new UserResource($user), 200);
             }
         } else {

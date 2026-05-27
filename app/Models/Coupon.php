@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
-class Restaurant extends Model
+class Coupon extends Model
 {
     use SoftDeletes, LogsActivity;
 
-    protected $table = 'restaurants'; // optional (Laravel auto-detects)
+    protected $table = 'coupons'; // optional (Laravel auto-detects)
 
     /**
      * The attributes that are mass assignable.
@@ -20,10 +20,10 @@ class Restaurant extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'name',
-        'user_id',
-        'description',
-        'is_blocked'
+        'code',
+        'discount_percent',
+        'expires_at',
+        'is_active'
     ];
 
     /**
@@ -33,20 +33,7 @@ class Restaurant extends Model
      */
     protected $hidden = [];
 
-    protected $attributes = [
-        'user_id' => NULL
-    ];
-
-    // Relations
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    public function meals()
-    {
-        return $this->hasMany(Meal::class);
-    }
+    protected $attributes = [];
 
     public function getCreatedAtAttribute($value)
     {

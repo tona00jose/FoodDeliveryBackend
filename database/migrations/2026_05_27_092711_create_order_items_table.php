@@ -11,17 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('meals', function (Blueprint $table) {
+        Schema::create('order_items', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->foreignId('restaurant_id')
-                  ->constrained('restaurants')
+            $table->foreignId('order_id')
+                  ->constrained('orders')
                   ->cascadeOnDelete()
                   ->cascadeOnUpdate()
                   ->unique();
-            $table->text('description')->nullable();
-            $table->decimal('price', 15, 2)->default(0);
-            $table->unsignedSmallInteger('is_blocked')->nullable()->default(0)->comment('0:enabled, 1:blocked');
+            $table->foreignId('meal_id')
+                  ->constrained('meals')
+                  ->cascadeOnDelete()
+                  ->cascadeOnUpdate()
+                  ->unique();
+            $table->integer('quantity')->default(1);
+            $table->decimal('price_at_order_time', 15, 2)->default(0);
+            $table->decimal('subtotal', 15, 2)->default(0); // quantity * price_at_order_time
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
             $table->softDeletes();
@@ -33,6 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('meals');
+        Schema::dropIfExists('order_items');
     }
 };

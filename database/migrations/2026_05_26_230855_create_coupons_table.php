@@ -17,7 +17,6 @@ return new class extends Migration
             $table->decimal('discount_percent', 5, 2);
             $table->timestamp('expires_at')->nullable();
             $table->boolean('is_active')->default(true);
-            // $table->timestamps();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
             $table->softDeletes();

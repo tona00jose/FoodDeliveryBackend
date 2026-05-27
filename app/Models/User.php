@@ -46,9 +46,15 @@ class User extends Authenticatable
         'is_blocked' => 0,
     ];
 
+    // Relations
     public function restaurants()
     {
         return $this->hasMany(Restaurant::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
     }
 
     public function getCreatedAtAttribute($value)

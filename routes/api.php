@@ -2,13 +2,15 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 use App\Http\Controllers\Api\AuthController;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RestaurantController;
 use App\Http\Controllers\Api\MealController;
 use App\Http\Controllers\Api\CouponController;
+use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\OrderItemController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
@@ -52,6 +54,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::delete('/meals/{meal}', [MealController::class, 'destroy']);                             // delete
         Route::put('/meals/block/{meal}', [MealController::class, 'blockItem']);                        // block
     });
+
+    // order
+    Route::post('/orders', [OrderController::class, 'store']);                            // create
 
 });
 

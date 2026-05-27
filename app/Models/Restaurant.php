@@ -48,6 +48,11 @@ class Restaurant extends Model
         return $this->hasMany(Meal::class);
     }
 
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
     public function getCreatedAtAttribute($value)
     {
         return \Carbon\Carbon::parse($value)->format('Y-m-d');

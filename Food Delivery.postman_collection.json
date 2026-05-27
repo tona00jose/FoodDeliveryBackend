@@ -92,7 +92,7 @@
               "urlencoded": [
                 {
                   "key": "email",
-                  "value": "aaa@gmail.com",
+                  "value": "ccc@gmail.com",
                   "type": "text",
                   "uuid": "4dfc414d-fc11-48fc-a606-6ac5f5d7b143"
                 },
@@ -1182,6 +1182,48 @@
                 "admin",
                 "coupons",
                 "3"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Order",
+      "item": [
+        {
+          "name": "create order",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"restaurant_id\": 3,             // required|integer|exists:restaurants,id\r\n    \"coupon_code\": \"7CIRPJO0\",      // nullable|string|max:255|exists:coupons,code\r\n    \"tip_amount\": 5,\r\n    \"items\": [\r\n        {\r\n            \"meal_id\": 1,\r\n            \"quantity\": 2\r\n        },\r\n        {\r\n            \"meal_id\": 3,\r\n            \"quantity\": 1\r\n        }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "orders"
               ]
             }
           },

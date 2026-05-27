@@ -21,7 +21,6 @@ return new class extends Migration
                   ->unique();
             $table->text('description')->nullable();
             $table->unsignedSmallInteger('is_blocked')->nullable()->default(0)->comment('0:enabled, 1:blocked');
-            // $table->timestamps();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
             $table->softDeletes();

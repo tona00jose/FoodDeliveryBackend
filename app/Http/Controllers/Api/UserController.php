@@ -25,7 +25,8 @@ class UserController extends ApiController
     public function index(Request $request)
     {
         // Default per page
-        $per_page = $request->input('per_page', 10);
+        $per_page = (int) $request->input('per_page', 10);
+        if($per_page < 0) $per_page = 0;
 
         // Build query
         // $query = User::with('restaurants');

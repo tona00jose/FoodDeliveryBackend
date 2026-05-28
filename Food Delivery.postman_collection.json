@@ -8,7 +8,7 @@
   },
   "item": [
     {
-      "name": "Auth Management",
+      "name": "Auth",
       "item": [
         {
           "name": "register",
@@ -148,7 +148,7 @@
       ]
     },
     {
-      "name": "User Management",
+      "name": "User Management(admin)",
       "item": [
         {
           "name": "get user list",
@@ -178,27 +178,24 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}/api/admin/users",
+              "raw": "{{base_url}}/api/users?per_page=5",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
-                "admin",
                 "users"
               ],
               "query": [
                 {
                   "key": "per_page",
                   "value": "5",
-                  "description": "0 : all, 0 > : show items per page(defaule is 10)",
-                  "disabled": true
+                  "description": "0 : all, 0 > : show items per page(defaule is 10)"
                 },
                 {
                   "key": "search_string",
-                  "value": "aaa",
+                  "value": "aaa@gmail",
                   "description": "Values ​​for searching name or email",
-                  "type": "text",
                   "disabled": true
                 }
               ]
@@ -262,13 +259,12 @@
               ]
             },
             "url": {
-              "raw": "{{base_url}}/api/admin/users",
+              "raw": "{{base_url}}/api/users",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
-                "admin",
                 "users"
               ]
             }
@@ -291,13 +287,12 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/admin/users/2",
+              "raw": "{{base_url}}/api/users/2",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
-                "admin",
                 "users",
                 "2"
               ]
@@ -365,13 +360,12 @@
               ]
             },
             "url": {
-              "raw": "{{base_url}}/api/admin/users/6",
+              "raw": "{{base_url}}/api/users/6",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
-                "admin",
                 "users",
                 "6"
               ]
@@ -395,15 +389,14 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/admin/users/5",
+              "raw": "{{base_url}}/api/users/11",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
-                "admin",
                 "users",
-                "5"
+                "11"
               ]
             }
           },
@@ -425,16 +418,15 @@
             "method": "PUT",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/admin/users/block/3",
+              "raw": "{{base_url}}/api/users/block/10",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
-                "admin",
                 "users",
                 "block",
-                "3"
+                "10"
               ]
             }
           },
@@ -443,7 +435,7 @@
       ]
     },
     {
-      "name": "Restaurant Management",
+      "name": "Restaurant Management(admin, owner)",
       "item": [
         {
           "name": "get restaurant list",
@@ -513,7 +505,7 @@
                 },
                 {
                   "key": "user_id",
-                  "value": "3",
+                  "value": "6",
                   "description": "Use only if the registering user is an admin.  If the user is the restaurant owner, default value is the logged-in user's id.",
                   "type": "text",
                   "uuid": "93a199bb-b530-4a5f-9fc7-57f74fe9cdef"
@@ -563,14 +555,14 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/restaurants/3",
+              "raw": "{{base_url}}/api/restaurants/1",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
                 "restaurants",
-                "3"
+                "1"
               ]
             }
           },
@@ -699,7 +691,7 @@
       ]
     },
     {
-      "name": "Meal Management",
+      "name": "Meal Management(admin, owner)",
       "item": [
         {
           "name": "get meal list",
@@ -727,15 +719,15 @@
               ],
               "query": [
                 {
+                  "key": "per_page",
+                  "value": "5"
+                },
+                {
                   "key": "search_string",
                   "value": "bubby",
                   "description": "Values ​​for searching meal name, description or restaurant name",
                   "type": "text",
                   "disabled": true
-                },
-                {
-                  "key": "per_page",
-                  "value": "5"
                 }
               ]
             }
@@ -866,7 +858,7 @@
                 },
                 {
                   "key": "restaurant_id",
-                  "value": "1",
+                  "value": "3",
                   "description": "required|integer|exists:restaurants,id",
                   "type": "text",
                   "uuid": "6811c119-3e99-4100-96ea-72fe7b177432"
@@ -969,7 +961,7 @@
       ]
     },
     {
-      "name": "Coupon Management",
+      "name": "Coupon Management(admin)",
       "item": [
         {
           "name": "get coupon list",
@@ -987,21 +979,19 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/admin/coupons?per_page=5",
+              "raw": "{{base_url}}/api/coupons?per_page=5",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
-                "admin",
                 "coupons"
               ],
               "query": [
                 {
                   "key": "per_page",
                   "value": "5",
-                  "description": "0 : all, 0 > : show items per page(defaule is 10)",
-                  "type": "text"
+                  "description": "0 : all, 0 > : show items per page(defaule is 10)"
                 },
                 {
                   "key": "search_string",
@@ -1058,13 +1048,12 @@
               ]
             },
             "url": {
-              "raw": "{{base_url}}/api/admin/coupons",
+              "raw": "{{base_url}}/api/coupons",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
-                "admin",
                 "coupons"
               ]
             }
@@ -1087,13 +1076,12 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/admin/coupons/3",
+              "raw": "{{base_url}}/api/coupons/3",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
-                "admin",
                 "coupons",
                 "3"
               ]
@@ -1143,13 +1131,12 @@
               ]
             },
             "url": {
-              "raw": "{{base_url}}/api/admin/coupons/3",
+              "raw": "{{base_url}}/api/coupons/3",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
-                "admin",
                 "coupons",
                 "3"
               ]
@@ -1173,13 +1160,12 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/admin/coupons/3",
+              "raw": "{{base_url}}/api/coupons/3",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
-                "admin",
                 "coupons",
                 "3"
               ]
@@ -1190,10 +1176,10 @@
       ]
     },
     {
-      "name": "Order",
+      "name": "Order(customer, owner)",
       "item": [
         {
-          "name": "create order",
+          "name": "create order(customer)",
           "request": {
             "auth": {
               "type": "bearer",
@@ -1217,18 +1203,416 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}/api/orders",
+              "raw": "{{base_url}}/api/orders/create",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
-                "orders"
+                "orders",
+                "create"
               ]
             }
           },
           "response": []
         },
+        {
+          "name": "order list",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Visualization Script",
+                  "// Visualization Script",
+                  "const template = `",
+                  "<style>",
+                  "  body { font-family: Arial, sans-serif; padding: 16px; color: #222; }",
+                  "  .metrics { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }",
+                  "  .card { background: #f8f9fb; border: 1px solid #e3e7ef; border-radius: 8px; padding: 12px 16px; min-width: 180px; }",
+                  "  .card .label { font-size: 12px; color: #667085; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }",
+                  "  .card .value { font-size: 22px; font-weight: 700; color: #111827; }",
+                  "  table { width: 100%; border-collapse: collapse; font-size: 14px; }",
+                  "  th, td { border: 1px solid #e5e7eb; padding: 10px; text-align: left; vertical-align: top; }",
+                  "  th { background: #f3f4f6; font-weight: 600; }",
+                  "  tr:nth-child(even) { background: #fafafa; }",
+                  "  .empty { padding: 16px; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; color: #9a3412; }",
+                  "</style>",
+                  "",
+                  "{{#if hasOrders}}",
+                  "  <div class=\"metrics\">",
+                  "    <div class=\"card\">",
+                  "      <div class=\"label\">Total Orders</div>",
+                  "      <div class=\"value\">{{totalOrders}}</div>",
+                  "    </div>",
+                  "    <div class=\"card\">",
+                  "      <div class=\"label\">Sum of Total Amount</div>",
+                  "      <div class=\"value\">{{totalAmount}}</div>",
+                  "    </div>",
+                  "  </div>",
+                  "",
+                  "  <table>",
+                  "    <thead>",
+                  "      <tr>",
+                  "        <th>Order ID</th>",
+                  "        <th>User Name</th>",
+                  "        <th>Restaurant Name</th>",
+                  "        <th>Total Amount</th>",
+                  "        <th>Status</th>",
+                  "        <th>Ordered At</th>",
+                  "        <th>Item Count</th>",
+                  "      </tr>",
+                  "    </thead>",
+                  "    <tbody>",
+                  "      {{#each orders}}",
+                  "        <tr>",
+                  "          <td>{{id}}</td>",
+                  "          <td>{{user_name}}</td>",
+                  "          <td>{{restaurant_name}}</td>",
+                  "          <td>{{total_amount}}</td>",
+                  "          <td>{{status_name}}</td>",
+                  "          <td>{{ordered_at}}</td>",
+                  "          <td>{{item_count}}</td>",
+                  "        </tr>",
+                  "      {{/each}}",
+                  "    </tbody>",
+                  "  </table>",
+                  "{{else}}",
+                  "  <div class=\"empty\">No orders were found in the response.</div>",
+                  "{{/if}}",
+                  "`;",
+                  "",
+                  "function createPayload() {",
+                  "  let json = {};",
+                  "  try {",
+                  "    json = pm.response.json();",
+                  "  } catch (e) {",
+                  "    return {",
+                  "      hasOrders: false,",
+                  "      totalOrders: 0,",
+                  "      totalAmount: '$0.00',",
+                  "      orders: []",
+                  "    };",
+                  "  }",
+                  "",
+                  "  const rawOrders = Array.isArray(json?.data?.orders) ? json.data.orders : [];",
+                  "",
+                  "  const formatAmount = (value) => {",
+                  "    const num = Number(value);",
+                  "    if (Number.isFinite(num)) {",
+                  "      return `$${num.toFixed(2)}`;",
+                  "    }",
+                  "    return value == null || value === '' ? 'N/A' : String(value);",
+                  "  };",
+                  "",
+                  "  const formatDate = (value) => {",
+                  "    if (!value) return 'N/A';",
+                  "    const date = new Date(value);",
+                  "    if (!Number.isNaN(date.getTime())) {",
+                  "      return date.toLocaleString();",
+                  "    }",
+                  "    return String(value);",
+                  "  };",
+                  "",
+                  "  const orders = rawOrders.map((order) => ({",
+                  "    id: order?.id ?? 'N/A',",
+                  "    user_name: order?.user_name || 'N/A',",
+                  "    restaurant_name: order?.restaurant_name || 'N/A',",
+                  "    total_amount: formatAmount(order?.total_amount),",
+                  "    status_name: order?.status_name || 'N/A',",
+                  "    ordered_at: formatDate(order?.ordered_at),",
+                  "    item_count: Array.isArray(order?.order_items) ? order.order_items.length : 0",
+                  "  }));",
+                  "",
+                  "  const totalOrders = orders.length;",
+                  "  const sum = rawOrders.reduce((acc, order) => {",
+                  "    const value = Number(order?.total_amount);",
+                  "    return Number.isFinite(value) ? acc + value : acc;",
+                  "  }, 0);",
+                  "",
+                  "  return {",
+                  "    hasOrders: totalOrders > 0,",
+                  "    totalOrders,",
+                  "    totalAmount: `$${sum.toFixed(2)}`,",
+                  "    orders",
+                  "  };",
+                  "}",
+                  "",
+                  "pm.visualizer.set(template, createPayload());"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/orders/list?per_page=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                "list"
+              ],
+              "query": [
+                {
+                  "key": "per_page",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "order detail",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Visualization Script",
+                  "// Visualization Script",
+                  "const template = `",
+                  "<style>",
+                  "  body { font-family: Arial, sans-serif; padding: 16px; color: #222; }",
+                  "  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 20px; }",
+                  "  .card { border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px; background: #fafafa; }",
+                  "  .label { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }",
+                  "  .value { font-size: 16px; font-weight: 600; word-break: break-word; }",
+                  "  .section-title { margin: 24px 0 12px; font-size: 18px; font-weight: 700; }",
+                  "  table { width: 100%; border-collapse: collapse; margin-top: 8px; }",
+                  "  th, td { border: 1px solid #ddd; padding: 10px; text-align: left; vertical-align: top; }",
+                  "  th { background: #f3f4f6; font-weight: 700; }",
+                  "  tr:nth-child(even) { background: #fafafa; }",
+                  "  .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #eef2ff; color: #3730a3; font-weight: 600; }",
+                  "  .empty { color: #777; font-style: italic; padding: 8px 0; }",
+                  "</style>",
+                  "",
+                  "<div>",
+                  "  <div class=\"section-title\">Order Summary</div>",
+                  "  <div class=\"grid\">",
+                  "    {{#each summary}}",
+                  "      <div class=\"card\">",
+                  "        <div class=\"label\">{{label}}</div>",
+                  "        <div class=\"value\">{{value}}</div>",
+                  "      </div>",
+                  "    {{/each}}",
+                  "  </div>",
+                  "",
+                  "  <div class=\"section-title\">Order Items</div>",
+                  "  {{#if hasItems}}",
+                  "    <table>",
+                  "      <thead>",
+                  "        <tr>",
+                  "          <th>Item ID</th>",
+                  "          <th>Meal</th>",
+                  "          <th>Quantity</th>",
+                  "          <th>Price at Order Time</th>",
+                  "          <th>Subtotal</th>",
+                  "        </tr>",
+                  "      </thead>",
+                  "      <tbody>",
+                  "        {{#each items}}",
+                  "          <tr>",
+                  "            <td>{{id}}</td>",
+                  "            <td>{{meal_name}}</td>",
+                  "            <td>{{quantity}}</td>",
+                  "            <td>{{price_at_order_time}}</td>",
+                  "            <td>{{subtotal}}</td>",
+                  "          </tr>",
+                  "        {{/each}}",
+                  "      </tbody>",
+                  "    </table>",
+                  "  {{else}}",
+                  "    <div class=\"empty\">No order items found.</div>",
+                  "  {{/if}}",
+                  "",
+                  "  <div class=\"section-title\">Status History</div>",
+                  "  {{#if hasHistory}}",
+                  "    <table>",
+                  "      <thead>",
+                  "        <tr>",
+                  "          <th>Old Status</th>",
+                  "          <th>New Status</th>",
+                  "          <th>Changed At</th>",
+                  "        </tr>",
+                  "      </thead>",
+                  "      <tbody>",
+                  "        {{#each history}}",
+                  "          <tr>",
+                  "            <td>{{old_status_name}}</td>",
+                  "            <td><span class=\"badge\">{{new_status_name}}</span></td>",
+                  "            <td>{{created_at}}</td>",
+                  "          </tr>",
+                  "        {{/each}}",
+                  "      </tbody>",
+                  "    </table>",
+                  "  {{else}}",
+                  "    <div class=\"empty\">No status history found.</div>",
+                  "  {{/if}}",
+                  "</div>`;",
+                  "",
+                  "function createPayload() {",
+                  "  const response = pm.response.json() || {};",
+                  "  const order = response.data || {};",
+                  "  const safe = (value) => {",
+                  "    if (value === null || value === undefined || value === '') return 'N/A';",
+                  "    return String(value);",
+                  "  };",
+                  "  const money = (value) => {",
+                  "    if (value === null || value === undefined || value === '') return 'N/A';",
+                  "    return `$${value}`;",
+                  "  };",
+                  "",
+                  "  const summary = [",
+                  "    { label: 'Order ID', value: safe(order.id) },",
+                  "    { label: 'User', value: safe(order.user_name || order.user_id) },",
+                  "    { label: 'Restaurant', value: safe(order.restaurant_name || order.restaurant_id) },",
+                  "    { label: 'Status', value: safe(order.status_name || order.status) },",
+                  "    { label: 'Ordered At', value: safe(order.ordered_at) },",
+                  "    { label: 'Subtotal', value: money(order.subtotal) },",
+                  "    { label: 'Discount Amount', value: money(order.discount_amount) },",
+                  "    { label: 'Tip Amount', value: money(order.tip_amount) },",
+                  "    { label: 'Total Amount', value: money(order.total_amount) }",
+                  "  ];",
+                  "",
+                  "  const items = Array.isArray(order.order_items)",
+                  "    ? order.order_items.map((item) => ({",
+                  "        id: safe(item.id),",
+                  "        meal_name: safe(item.meal_name),",
+                  "        quantity: safe(item.quantity),",
+                  "        price_at_order_time: money(item.price_at_order_time),",
+                  "        subtotal: money(item.subtotal)",
+                  "      }))",
+                  "    : [];",
+                  "",
+                  "  const history = Array.isArray(order.order_status_histories)",
+                  "    ? order.order_status_histories.map((entry) => ({",
+                  "        old_status_name: safe(entry.old_status_name),",
+                  "        new_status_name: safe(entry.new_status_name),",
+                  "        created_at: safe(entry.created_at)",
+                  "      }))",
+                  "    : [];",
+                  "",
+                  "  return {",
+                  "    summary,",
+                  "    items,",
+                  "    history,",
+                  "    hasItems: items.length > 0,",
+                  "    hasHistory: history.length > 0",
+                  "  };",
+                  "}",
+                  "",
+                  "pm.visualizer.set(template, createPayload());"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/orders/order/5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                "order",
+                "5"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update order status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "status",
+                  "value": "6",
+                  "description": "0:placed, 1:canceled, 2:processing, 3:in route, 4:delivered, 5:received, 6:rejected",
+                  "type": "text",
+                  "uuid": "dbbac532-9d3a-4827-8a32-208252327418"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/orders/updateStatus/5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                "updateStatus",
+                "5"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Order Management(admin)",
+      "item": [
         {
           "name": "get order list",
           "event": [
@@ -1397,6 +1781,81 @@
                   "key": "per_page",
                   "value": "5"
                 }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create order",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "user_id",
+                  "value": "8",
+                  "description": "user must have customer role",
+                  "type": "text",
+                  "uuid": "de28fd39-2c62-439d-9555-859bb24159fc"
+                },
+                {
+                  "key": "restaurant_id",
+                  "value": "14",
+                  "description": "required|integer|exists:restaurants,id",
+                  "type": "text",
+                  "uuid": "97fc2dfe-8a4b-4125-8952-d628924467a9"
+                },
+                {
+                  "key": "subtotal",
+                  "value": "123",
+                  "description": "required|numeric|min:0|max:9999999999999.99|decimal:0,2",
+                  "type": "text",
+                  "uuid": "8b8431c1-875d-460c-8cad-147f288aa151"
+                },
+                {
+                  "key": "coupon_id",
+                  "value": "4",
+                  "description": "nullable|integer|exists:coupons,id",
+                  "type": "text",
+                  "uuid": "49d40b09-8edc-4de2-a536-b4e14d4fe763"
+                },
+                {
+                  "key": "tip_amount",
+                  "value": "15",
+                  "description": "nullable|numeric|min:0|max:9999999999999.99|decimal:0,2",
+                  "type": "text",
+                  "uuid": "028a1662-3986-47e5-b6d6-ef1f8019c097"
+                },
+                {
+                  "key": "status",
+                  "value": "0",
+                  "description": "nullable|integer| 0:placed, 1:canceled, 2:processing, 3:in route, 4:delivered, 5:received, 6:rejected",
+                  "type": "text",
+                  "uuid": "f9617e8c-4b8d-425c-b15e-ec80d56a1890"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "orders"
               ]
             }
           },
@@ -1578,6 +2037,82 @@
           "response": []
         },
         {
+          "name": "update order",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "user_id",
+                  "value": "8",
+                  "description": "user must have customer role",
+                  "type": "text",
+                  "uuid": "de28fd39-2c62-439d-9555-859bb24159fc"
+                },
+                {
+                  "key": "restaurant_id",
+                  "value": "13",
+                  "description": "required|integer|exists:restaurants,id",
+                  "type": "text",
+                  "uuid": "97fc2dfe-8a4b-4125-8952-d628924467a9"
+                },
+                {
+                  "key": "subtotal",
+                  "value": "12",
+                  "description": "required|numeric|min:0|max:9999999999999.99|decimal:0,2",
+                  "type": "text",
+                  "uuid": "8b8431c1-875d-460c-8cad-147f288aa151"
+                },
+                {
+                  "key": "coupon_id",
+                  "value": "2",
+                  "description": "nullable|integer|exists:coupons,id",
+                  "type": "text",
+                  "uuid": "49d40b09-8edc-4de2-a536-b4e14d4fe763"
+                },
+                {
+                  "key": "tip_amount",
+                  "value": "15",
+                  "description": "nullable|numeric|min:0|max:9999999999999.99|decimal:0,2",
+                  "type": "text",
+                  "uuid": "028a1662-3986-47e5-b6d6-ef1f8019c097"
+                },
+                {
+                  "key": "status",
+                  "value": "0",
+                  "description": "nullable|integer| 0:placed, 1:canceled, 2:processing, 3:in route, 4:delivered, 5:received, 6:rejected",
+                  "type": "text",
+                  "uuid": "f9617e8c-4b8d-425c-b15e-ec80d56a1890"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/orders/11",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                "11"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "delete order",
           "request": {
             "auth": {
@@ -1605,50 +2140,124 @@
             }
           },
           "response": []
-        },
-        {
-          "name": "update order status",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "urlencoded",
-              "urlencoded": [
-                {
-                  "key": "status",
-                  "value": "6",
-                  "description": "0:placed, 1:canceled, 2:processing, 3:in route, 4:delivered, 5:received, 6:rejected",
-                  "type": "text",
-                  "uuid": "dbbac532-9d3a-4827-8a32-208252327418"
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{base_url}}/api/orders/updateStatus/5",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "orders",
-                "updateStatus",
-                "5"
-              ]
-            }
-          },
-          "response": []
         }
       ]
+    },
+    {
+      "name": "restaurant list",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/restaurants/list?per_page=5",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "restaurants",
+            "list"
+          ],
+          "query": [
+            {
+              "key": "per_page",
+              "value": "5",
+              "description": "0 : all, 0 > : show items per page(defaule is 10)"
+            },
+            {
+              "key": "search_string",
+              "value": "Osteria",
+              "description": "Values ​​for searching restaurant name, description or user name",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "restaurant detail",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/restaurants/item/1",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "restaurants",
+            "item",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "meal list",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/meals/list?per_page=5",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "meals",
+            "list"
+          ],
+          "query": [
+            {
+              "key": "per_page",
+              "value": "5"
+            },
+            {
+              "key": "search_string",
+              "value": "bubby",
+              "description": "Values ​​for searching meal name, description or restaurant name",
+              "type": "text",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "meal detail",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/meals/item/1",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "meals",
+            "item",
+            "1"
+          ]
+        }
+      },
+      "response": []
     }
   ],
   "event": [

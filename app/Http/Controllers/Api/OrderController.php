@@ -32,15 +32,6 @@ class OrderController extends ApiController
         // $query = Order::query();
         $query = Order::with('orderItems', 'orderStatusHistories');
 
-        $user = auth()->user();
-        if($user->role == self::ROLE_RESTAURANT_OWNER) { // restaurant owner
-            $query->whereHas('restaurant', function ($q) use ($user) {
-                $q->where('user_id', $user->id);
-            });
-        } else if($user->role == self::ROLE_CUSTOMER) { // customer
-            $query->where('user_id', $user->id);
-        }
-
         // Paginate
         if ($per_page == 0) {
             $collection = $query->get();
@@ -70,6 +61,181 @@ class OrderController extends ApiController
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
+    {
+        // validation check ===================================================================
+        $rules = [
+            'coupon_id'     => 'nullable|integer|exists:coupons,id,deleted_at,NULL',
+            'tip_amount'    => 'nullable|numeric|min:0|max:9999999999999.99|decimal:0,2',
+            'subtotal'      => 'required|numeric|min:0|max:9999999999999.99|decimal:0,2',
+            'status'        => 'nullable|integer|in:0,1,2,3,4,5,6',
+            'ordered_at'    => 'nullable|date',
+        ];
+        $userRule = Rule::exists('users', 'id')
+            ->where(function ($query) {
+                $query->whereNull('users.deleted_at')->where('users.role', self::ROLE_CUSTOMER);
+            });
+        $rules['user_id'] = ['required', 'integer', $userRule];
+
+        // 'restaurant_id'     => 'required|integer|exists:restaurants,id'
+        $restaurantRule = Rule::exists('restaurants', 'id')
+            ->where(function ($query) {
+                $query->whereNull('restaurants.deleted_at')
+                    // restaurant owner
+                    ->whereExists(function ($userQuery) {
+                        $userQuery->select(DB::raw(1))
+                            ->from('users')
+                            ->whereColumn('users.id', 'restaurants.user_id')
+                            ->where('users.role', self::ROLE_RESTAURANT_OWNER)
+                            ->whereNull('users.deleted_at');
+                    });
+            });
+        $rules['restaurant_id'] = ['required', 'integer', $restaurantRule];
+        
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return $this->errorResponse($validator->messages(), 422);
+        }
+
+        // Order ===============================================================================
+        $discountAmount = 0;
+        if ($request->coupon_id) {
+            $coupon = Coupon::find($request->coupon_id);
+            if ($coupon) {
+                $discountAmount = ($request->subtotal * $coupon->discount_percent) / 100;
+            }
+        }
+        $tipAmount = $request->tip_amount ?? 0;
+        $totalAmount = $request->subtotal - $discountAmount + $tipAmount;
+
+        DB::beginTransaction();
+        try {
+            $order = Order::create([
+                'user_id'         => $request->user_id,
+                'restaurant_id'   => $request->restaurant_id,
+                'coupon_id'       => $request->coupon_id,
+                'tip_amount'      => $tipAmount,
+                'subtotal'        => $request->subtotal,
+                'discount_amount' => $discountAmount,
+                'total_amount'    => $totalAmount,
+                'status'          => $request->status ?? Order::STATUS_PLACED,
+                'ordered_at'      => $request->ordered_at ?? now(),
+            ]);           
+            DB::commit();
+            return $this->successResponse(new OrderResource($order), 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->errorResponse($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        $order = Order::find($id);        
+        if($order){
+            $order->load('orderItems');
+            $order->load('orderStatusHistories');
+            return $this->successResponse(new OrderResource($order));
+        } else {
+            return $this->errorResponse(__('message.not_found_msg'), 404);
+        }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        $order = Order::find($id);
+        if($order) {
+            $order->load('orderItems');
+            $order->load('orderStatusHistories');
+            // validation check ===================================================================
+            $rules = [
+                'coupon_id'     => 'nullable|integer|exists:coupons,id,deleted_at,NULL',
+                'tip_amount'    => 'nullable|numeric|min:0|max:9999999999999.99|decimal:0,2',
+                'status'        => 'nullable|integer|in:0,1,2,3,4,5,6',
+                'ordered_at'    => 'nullable|date',
+            ];
+            $userRule = Rule::exists('users', 'id')
+                ->where(function ($query) {
+                    $query->whereNull('users.deleted_at')->where('users.role', self::ROLE_CUSTOMER);
+                });
+            $rules['user_id'] = ['nullable', 'integer', $userRule];
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return $this->errorResponse($validator->messages(), 422);
+            }
+
+            // Order ===============================================================================
+            
+            $subtotal = 0;
+            foreach ($order->orderItems as $item) {
+                $subtotal += $item->price_at_order_time * $item->quantity;
+            }
+
+            $discountAmount = 0;
+            $coupon_id = $order->coupon_id;
+            if($request->has('coupon_id')  && $request->coupon_id != "") {
+                $coupon_id = $request->coupon_id;
+            }
+            if ($coupon_id) {
+                $coupon = Coupon::find($coupon_id);
+                if ($coupon) {
+                    $discountAmount = ($subtotal * $coupon->discount_percent) / 100;
+                }
+            }
+            $tipAmount = $request->tip_amount ?? 0;
+            $totalAmount = $subtotal - $discountAmount + $tipAmount;
+
+            DB::beginTransaction();
+            try {                
+                $order->update([
+                    'user_id' => $request->has('user_id')  && $request->user_id != "" ? $request->user_id : $order->user_id,
+                    'coupon_id' => $coupon_id,
+                    'tip_amount' => $tipAmount,
+                    'subtotal' => $subtotal,
+                    'discount_amount' => $discountAmount,
+                    'total_amount' => $totalAmount,
+                    'status' => $request->has('status')  && $request->status != "" ? $request->status : $order->status,
+                    'ordered_at' => $request->has('ordered_at')  && $request->ordered_at != "" ? $request->ordered_at : $order->ordered_at,
+                ]);
+
+                DB::commit();
+                return $this->successResponse(new OrderResource($order), 200);
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return $this->errorResponse($e->getMessage(), 500);
+            }
+        } else {
+            return $this->errorResponse(__('message.not_found_msg'), 404);
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        $order = Order::find($id);
+        if($order) {
+            $order->orderItems()->delete();
+            $order->orderStatusHistories()->delete();
+            $order->delete();
+            return $this->successResponse(new OrderResource($order), 200);
+        } else {
+            return $this->errorResponse(__('message.not_found_msg'), 404);
+        }
+    }
+
+    /**
+     * Create order by customer
+     */
+    public function createOrder(Request $request)
     {
         // validation check ===================================================================
         $rules = [
@@ -220,60 +386,6 @@ class OrderController extends ApiController
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        $order = Order::find($id);        
-        if($order){
-            $order->load('orderItems');
-            $order->load('orderStatusHistories');
-            $user = auth()->user();
-            if($user->role == self::ROLE_ADMIN) { // admin
-                return $this->successResponse(new OrderResource($order));
-            } else if($user->role == self::ROLE_CUSTOMER) { // customer
-                if($order->user_id != $user->id) { 
-                    return $this->errorResponse(__('message.cannot_access'), 403);
-                } else {
-                    return $this->successResponse(new OrderResource($order));
-                }
-            } else {    // restaurant owner
-                if($order->restaurant->user_id == $user->id) {
-                    return $this->successResponse(new OrderResource($order));
-                } else {
-                    return $this->errorResponse(__('message.can_access_only_restaurant_owner'), 403);
-                }
-            }
-        } else {
-            return $this->errorResponse(__('message.not_found_msg'), 404);
-        }
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        $order = Order::find($id);
-        if($order) {
-            $order->orderItems()->delete();
-            $order->orderStatusHistories()->delete();
-            $order->delete();
-            return $this->successResponse(new OrderResource($order), 200);
-        } else {
-            return $this->errorResponse(__('message.not_found_msg'), 404);
-        }
-    }
-
-    /**
      * Update status in storage.
      */
     public function updateStatus(Request $request, string $id)
@@ -342,7 +454,84 @@ class OrderController extends ApiController
                     return $this->errorResponse(__('message.cannot_change_status'), 403);
                 }
             } else {
-                return $this->errorResponse(__('message.can_access_only_admin_or_restaurant_owner'), 403);
+                return $this->errorResponse(__('message.cannot_access'), 403);
+            }
+        } else {
+            return $this->errorResponse(__('message.not_found_msg'), 404);
+        }
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function getList(Request $request)
+    {
+        // Default per page
+        $per_page = (int) $request->input('per_page', 10);
+        if($per_page < 0) $per_page = 0;
+
+        // Build query
+        // $query = Order::query();
+        $query = Order::with('orderItems', 'orderStatusHistories');
+
+        $user = auth()->user();
+        if($user->role == self::ROLE_RESTAURANT_OWNER) { // restaurant owner
+            $query->whereHas('restaurant', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            });
+        } else if($user->role == self::ROLE_CUSTOMER) { // customer
+            $query->where('user_id', $user->id);
+        }
+
+        // Paginate
+        if ($per_page == 0) {
+            $collection = $query->get();
+            $orders = new LengthAwarePaginator(
+                $collection,
+                $collection->count(),
+                $collection->count(), // all in one page
+                0,
+                [
+                    'path' => request()->url(),
+                    'query' => request()->query(),
+                ]
+            );
+        } else {
+            $orders = $query->paginate($per_page);
+        }
+
+        // Return paginated resource
+        return $this->successResponse([
+            'orders' => OrderResource::collection($orders),
+            'links' => OrderResource::collection($orders)->response()->getData()->links,
+            'meta' => OrderResource::collection($orders)->response()->getData()->meta,
+        ]);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function getOrder(string $id)
+    {
+        $order = Order::find($id);        
+        if($order){
+            $order->load('orderItems');
+            $order->load('orderStatusHistories');
+            $user = auth()->user();
+            if($user->role == self::ROLE_CUSTOMER) { // customer
+                if($order->user_id != $user->id) { 
+                    return $this->errorResponse(__('message.cannot_access'), 403);
+                } else {
+                    return $this->successResponse(new OrderResource($order));
+                }
+            } else if($user->role == self::ROLE_RESTAURANT_OWNER) {    // restaurant owner
+                if($order->restaurant->user_id == $user->id) {
+                    return $this->successResponse(new OrderResource($order));
+                } else {
+                    return $this->errorResponse(__('message.can_access_only_restaurant_owner'), 403);
+                }
+            } else {
+                return $this->errorResponse(__('message.cannot_access'), 403);
             }
         } else {
             return $this->errorResponse(__('message.not_found_msg'), 404);

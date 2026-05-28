@@ -33,15 +33,7 @@ class MealController extends ApiController
             $query->whereHas('restaurant', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
-        } else if($user->role == self::ROLE_CUSTOMER) { // customer
-            $query->where('is_blocked', 0);
-            $query->whereHas('restaurant', function ($restaurantQuery) {
-                $restaurantQuery->where('is_blocked', 0);
-                $restaurantQuery->whereHas('user', function ($userQuery) {
-                    $userQuery->where('is_blocked', 0);
-                });
-            });
-        }
+        } 
 
         // Optional search
         if ($request->has('search_string') && $request->search_string != '') {
@@ -96,6 +88,16 @@ class MealController extends ApiController
         $restaurantRule = Rule::exists('restaurants', 'id')->whereNull('deleted_at');
         if ($user->role == self::ROLE_RESTAURANT_OWNER) { // restaurant owner
             $restaurantRule = $restaurantRule->where('user_id', $user->id);
+        } else if ($user->role == self::ROLE_ADMIN) { // admin
+            $restaurantRule = $restaurantRule->where(function ($query) {
+                $query->whereExists(function ($userQuery) {
+                        $userQuery->select(DB::raw(1))
+                            ->from('users')
+                            ->whereColumn('users.id', 'restaurants.user_id')
+                            ->where('users.role', self::ROLE_RESTAURANT_OWNER)
+                            ->whereNull('users.deleted_at');
+                    });
+            });
         }
         $rules['restaurant_id'] = ['required', 'integer', $restaurantRule];
         $validator = Validator::make($request->all(), $rules);
@@ -125,16 +127,6 @@ class MealController extends ApiController
             $user = auth()->user();
             if($user->role == self::ROLE_ADMIN) { // admin
                 return $this->successResponse(new MealResource($meal));
-            } else if($user->role == self::ROLE_CUSTOMER) { // customer
-                if($meal->is_blocked == 1) {                                                // blocked meal
-                    return $this->errorResponse(__('message.data_is_blocked'), 403);
-                } else if($meal->restaurant->is_blocked == 1) {                             // blocked restaurant
-                    return $this->errorResponse(__('message.restaurant_is_blocked'), 403);
-                } else if($meal->restaurant->user->is_blocked == 1) {                       // blocked restaurant owner
-                    return $this->errorResponse(__('message.restaurant_owner_is_blocked'), 403);
-                } else {
-                    return $this->successResponse(new MealResource($meal));
-                }
             } else {    // restaurant owner
                 if($meal->restaurant->user_id == $user->id) {
                     return $this->successResponse(new MealResource($meal));
@@ -173,6 +165,16 @@ class MealController extends ApiController
                 $restaurantRule = Rule::exists('restaurants', 'id')->whereNull('deleted_at');
                 if ($user->role == self::ROLE_RESTAURANT_OWNER) { // restaurant owner
                     $restaurantRule = $restaurantRule->where('user_id', $user->id);
+                } else if ($user->role == self::ROLE_ADMIN) { // admin
+                    $restaurantRule = $restaurantRule->where(function ($query) {
+                        $query->whereExists(function ($userQuery) {
+                                $userQuery->select(DB::raw(1))
+                                    ->from('users')
+                                    ->whereColumn('users.id', 'restaurants.user_id')
+                                    ->where('users.role', self::ROLE_RESTAURANT_OWNER)
+                                    ->whereNull('users.deleted_at');
+                            });
+                    });
                 }
                 $rules['restaurant_id'] = ['nullable', 'integer', $restaurantRule];
                 $validator = Validator::make($request->all(), $rules);
@@ -245,6 +247,83 @@ class MealController extends ApiController
                 return $this->successResponse(new MealResource($meal), 200);
             } else {
                 return $this->errorResponse(__('message.can_access_only_admin_or_restaurant_owner'), 403);
+            }
+        } else {
+            return $this->errorResponse(__('message.not_found_msg'), 404);
+        }
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function getList(Request $request)
+    {
+        // Default per page
+        $per_page = (int) $request->input('per_page', 10);
+        if($per_page < 0) $per_page = 0;
+
+        // Build query
+        $query = Meal::query();
+        $query->where('is_blocked', 0);
+        $query->whereHas('restaurant', function ($restaurantQuery) {
+            $restaurantQuery->where('is_blocked', 0);
+            $restaurantQuery->whereHas('user', function ($userQuery) {
+                $userQuery->where('is_blocked', 0);
+            });
+        });        
+
+        // Optional search
+        if ($request->has('search_string') && $request->search_string != '') {
+            $search = $request->search_string;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%")
+                ->orWhereHas('restaurant', function ($fq) use ($search) {
+                    $fq->where('name', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        // Paginate
+        if ($per_page == 0) {
+            $collection = $query->get();
+            $meals = new LengthAwarePaginator(
+                $collection,
+                $collection->count(),
+                $collection->count(), // all in one page
+                0,
+                [
+                    'path' => request()->url(),
+                    'query' => request()->query(),
+                ]
+            );
+        } else {
+            $meals = $query->paginate($per_page);
+        }
+
+        // Return paginated resource
+        return $this->successResponse([
+            'meals' => MealResource::collection($meals),
+            'links' => MealResource::collection($meals)->response()->getData()->links,
+            'meta' => MealResource::collection($meals)->response()->getData()->meta,
+        ]);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function getItem(string $id)
+    {
+        $meal = Meal::find($id);
+        if($meal){
+            if($meal->is_blocked == 1) {                                                // blocked meal
+                return $this->errorResponse(__('message.data_is_blocked'), 403);
+            } else if($meal->restaurant->is_blocked == 1) {                             // blocked restaurant
+                return $this->errorResponse(__('message.restaurant_is_blocked'), 403);
+            } else if($meal->restaurant->user->is_blocked == 1) {                       // blocked restaurant owner
+                return $this->errorResponse(__('message.restaurant_owner_is_blocked'), 403);
+            } else {
+                return $this->successResponse(new MealResource($meal));
             }
         } else {
             return $this->errorResponse(__('message.not_found_msg'), 404);

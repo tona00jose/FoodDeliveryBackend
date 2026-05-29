@@ -2023,14 +2023,14 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/orders/5",
+              "raw": "{{base_url}}/api/orders/11",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
                 "orders",
-                "5"
+                "11"
               ]
             }
           },
@@ -2060,20 +2060,6 @@
                   "description": "user must have customer role",
                   "type": "text",
                   "uuid": "de28fd39-2c62-439d-9555-859bb24159fc"
-                },
-                {
-                  "key": "restaurant_id",
-                  "value": "13",
-                  "description": "required|integer|exists:restaurants,id",
-                  "type": "text",
-                  "uuid": "97fc2dfe-8a4b-4125-8952-d628924467a9"
-                },
-                {
-                  "key": "subtotal",
-                  "value": "12",
-                  "description": "required|numeric|min:0|max:9999999999999.99|decimal:0,2",
-                  "type": "text",
-                  "uuid": "8b8431c1-875d-460c-8cad-147f288aa151"
                 },
                 {
                   "key": "coupon_id",
@@ -2136,6 +2122,205 @@
                 "api",
                 "orders",
                 "5"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Order Item Management(admin)",
+      "item": [
+        {
+          "name": "get item list",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/order/items?per_page=0",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "order",
+                "items"
+              ],
+              "query": [
+                {
+                  "key": "per_page",
+                  "value": "0"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create order item",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "order_id",
+                  "value": "11",
+                  "type": "text",
+                  "uuid": "ef147efa-fbf0-4578-9631-1310bdbea501"
+                },
+                {
+                  "key": "meal_id",
+                  "value": "2",
+                  "type": "text",
+                  "uuid": "4c70ff3f-2093-40f4-86bc-5eb6137cfad0"
+                },
+                {
+                  "key": "quantity",
+                  "value": "1",
+                  "type": "text",
+                  "uuid": "e7dee7d4-ba4b-40a7-9de6-0cda4d359090"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/order/items",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "order",
+                "items"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get order item detail",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/order/items/30",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "order",
+                "items",
+                "30"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update order item",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "meal_id",
+                  "value": "5",
+                  "type": "text",
+                  "uuid": "4c70ff3f-2093-40f4-86bc-5eb6137cfad0"
+                },
+                {
+                  "key": "quantity",
+                  "value": "1",
+                  "type": "text",
+                  "uuid": "e7dee7d4-ba4b-40a7-9de6-0cda4d359090"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/order/items/30",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "order",
+                "items",
+                "30"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete order item",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/order/items/30",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "order",
+                "items",
+                "30"
               ]
             }
           },

@@ -2188,18 +2188,21 @@
                 {
                   "key": "order_id",
                   "value": "11",
+                  "description": "required|integer|exists:orders,id",
                   "type": "text",
                   "uuid": "ef147efa-fbf0-4578-9631-1310bdbea501"
                 },
                 {
                   "key": "meal_id",
                   "value": "2",
+                  "description": "required|integer|exists:meals,id",
                   "type": "text",
                   "uuid": "4c70ff3f-2093-40f4-86bc-5eb6137cfad0"
                 },
                 {
                   "key": "quantity",
                   "value": "1",
+                  "description": "required|integer|min:1",
                   "type": "text",
                   "uuid": "e7dee7d4-ba4b-40a7-9de6-0cda4d359090"
                 }
@@ -2271,13 +2274,15 @@
                   "key": "meal_id",
                   "value": "5",
                   "type": "text",
-                  "uuid": "4c70ff3f-2093-40f4-86bc-5eb6137cfad0"
+                  "uuid": "4c70ff3f-2093-40f4-86bc-5eb6137cfad0",
+                  "description": "nullable|integer|exists:meals,id"
                 },
                 {
                   "key": "quantity",
                   "value": "1",
                   "type": "text",
-                  "uuid": "e7dee7d4-ba4b-40a7-9de6-0cda4d359090"
+                  "uuid": "e7dee7d4-ba4b-40a7-9de6-0cda4d359090",
+                  "description": "nullable|integer|min:1"
                 }
               ]
             },
